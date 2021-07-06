@@ -1,6 +1,5 @@
 package com.adityaoo7.sherlock.services
 
-import android.util.Log
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
@@ -13,6 +12,7 @@ object HashingService {
     fun hashPassword(password: String,salt: String) {
         this.salt = salt
         this.password = password
+        KEY = null
     }
 
     @Volatile
@@ -29,7 +29,6 @@ object HashingService {
             if (checkKeyAgain != null) {
                 checkKeyAgain
             } else {
-                Log.d("HashingService", "New Key created")
                 val saltBytes = salt.toByteArray()
                 val iterations = 1_00_000
                 val keyLength = 256

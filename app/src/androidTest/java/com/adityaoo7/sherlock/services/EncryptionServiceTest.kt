@@ -12,28 +12,29 @@ import org.junit.Test
 class EncryptionServiceTest {
 
     private lateinit var encryptionService: EncryptionService
-    private lateinit var account: LoginAccount
 
     @Before
     fun setUp() {
         HashingService.hashPassword("TestPassword", "SomeSalt")
         encryptionService = EncryptionService()
+    }
 
-        account = LoginAccount(
+    @Test
+    fun encryptAccountAndDecryptAccount_accountEncryptedAndDecryptedSuccessfully() {
+        // Given :
+        val account = LoginAccount(
             "Account Name",
             "user@name",
             "password",
             "https://linktoservice.com",
             "note about this account"
         )
-    }
 
-    @Test
-    fun encryptAccountAndDecryptAccount_accountEncryptedAndDecryptedSuccessfully() {
-
+        // When :
         val encryptedAccount = encryptionService.encryptAccount(account)
         val result = encryptionService.decryptAccount((encryptedAccount as Result.Success).data)
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(account.id))

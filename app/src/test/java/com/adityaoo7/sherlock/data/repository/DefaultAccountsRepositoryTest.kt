@@ -66,8 +66,10 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun observeAccounts_returnsAllAccounts() = mainCoroutineRule.runBlockingTest {
+        // When :
         val result = accountsRepository.observeAccounts().getOrAwaitValue()
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data, `is`(listOf(account1, account2)))
@@ -75,8 +77,10 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun observeAccount_returnsAccount() = mainCoroutineRule.runBlockingTest {
+        // When :
         val result = accountsRepository.observeAccount(account1.id).getOrAwaitValue()
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(account1.id))
@@ -89,9 +93,10 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun getAccount_returnsAccount() = mainCoroutineRule.runBlockingTest {
-
+        // When :
         val result = accountsRepository.getAccount(account1.id)
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(account1.id))
@@ -104,18 +109,21 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun getAccountThatIsNotPresent_returnsAccountNotFoundError() = mainCoroutineRule.runBlockingTest {
-
+        // When :
         val result = accountsRepository.getAccount(account3.id)
 
+        // Then :
         assertThat(result, `is`(instanceOf(Result.Error::class.java)))
     }
 
 
     @Test
     fun saveAccountAndGetAccount_returnsSavedAccount() = mainCoroutineRule.runBlockingTest {
+        // When :
         accountsRepository.saveAccount(account3)
         val result = accountsRepository.getAccount(account3.id)
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(account3.id))
@@ -128,6 +136,7 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun updateAccountAndGetAccount_returnsUpdatedAccount() = mainCoroutineRule.runBlockingTest {
+        // Given :
         val updatedAccount = LoginAccount(
             "New Account Name",
             "changed_Username",
@@ -136,10 +145,12 @@ class DefaultAccountsRepositoryTest {
             "Something new added to note",
             account1.id
         )
-        accountsRepository.updateAccount(updatedAccount)
 
+        // When :
+        accountsRepository.updateAccount(updatedAccount)
         val result = accountsRepository.getAccount(account1.id)
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(updatedAccount.id))
@@ -152,10 +163,11 @@ class DefaultAccountsRepositoryTest {
 
     @Test
     fun deleteAccountAndGetAccount_returnsAccountNotFoundError() = mainCoroutineRule.runBlockingTest {
-
+        // When :
         accountsRepository.deleteAccount(account2.id)
         val result = accountsRepository.getAccount(account2.id)
 
+        // Then :
         assertThat(result, `is`(instanceOf(Result.Error::class.java)))
     }
 }

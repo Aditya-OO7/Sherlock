@@ -124,6 +124,7 @@ class AccountsLocalDataSourceTest {
         // When :
         val result = localDataSource.observeAccount(account1.id).getOrAwaitValue()
 
+        // Then :
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data.id, `is`(account1.id))

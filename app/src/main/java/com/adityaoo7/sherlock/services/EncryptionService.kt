@@ -3,6 +3,7 @@ package com.adityaoo7.sherlock.services
 import android.util.Base64
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
+import java.lang.Exception
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 
@@ -49,19 +50,23 @@ class EncryptionService {
 
         val listOfDecryptedItems = ArrayList<String>()
 
-        listOfItemsToDecrypt.forEach { item ->
-            val itemByteArray = Base64.decode(item, Base64.NO_WRAP)
+        try {
+            listOfItemsToDecrypt.forEach { item ->
+                val itemByteArray = Base64.decode(item, Base64.NO_WRAP)
 
-            val iv = itemByteArray.copyOf(SIZE_OF_IV)
-            val cipherText = itemByteArray.copyOfRange(SIZE_OF_IV, itemByteArray.size)
+                val iv = itemByteArray.copyOf(SIZE_OF_IV)
+                val cipherText = itemByteArray.copyOfRange(SIZE_OF_IV, itemByteArray.size)
 
-            val gcmParameterSpec = GCMParameterSpec(128, iv)
+                val gcmParameterSpec = GCMParameterSpec(128, iv)
 
-            cipher.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec)
+                cipher.init(Cipher.DECRYPT_MODE, key, gcmParameterSpec)
 
-            val plainText = cipher.doFinal(cipherText)
+                val plainText = cipher.doFinal(cipherText)
 
-            listOfDecryptedItems.add(String(plainText))
+                listOfDecryptedItems.add(String(plainText))
+            }
+        } catch (e: Exception) {
+            return Result.Error(e)
         }
 
         decryptedAccount.name = listOfDecryptedItems[0]
