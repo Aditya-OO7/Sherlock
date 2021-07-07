@@ -60,6 +60,7 @@ dependencies {
     // Architecture Components
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0-alpha02'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0-alpha02'
     implementation 'androidx.test.espresso:espresso-idling-resource:3.4.0'
 
     // Room DB
@@ -84,5 +85,4 @@ dependencies {
     androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
     androidTestImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.0'
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 }

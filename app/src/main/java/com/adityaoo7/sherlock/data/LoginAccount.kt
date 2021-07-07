@@ -13,4 +13,10 @@ data class LoginAccount @JvmOverloads constructor(
     @ColumnInfo(name = "uri") var uri: String = "",
     @ColumnInfo(name = "note") var note: String = "",
     @PrimaryKey @ColumnInfo(name = "accountID") var id: String = UUID.randomUUID().toString()
-)
+) {
+    val titleForList: String
+        get() = if (name.isNotEmpty()) name else userName
+
+    val isEmpty
+        get() = userName.isEmpty() || password.isEmpty()
+}
