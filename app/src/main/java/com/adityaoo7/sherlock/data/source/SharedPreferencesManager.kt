@@ -11,5 +11,6 @@ interface SharedPreferencesManager {
     fun putSalt(salt: String)
     fun getSalt(): Result<String>
 
-    fun clearAll()
+    fun putIsRegistered(state: Boolean)
+    fun getIsRegistered(): Result<Boolean>
 }

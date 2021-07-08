@@ -1,4 +1,4 @@
-package com.adityaoo7.sherlock.data
+package com.adityaoo7.sherlock.util
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData

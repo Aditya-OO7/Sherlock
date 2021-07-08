@@ -1,5 +1,6 @@
 package com.adityaoo7.sherlock.services
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.succeeded
@@ -7,16 +8,14 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
-
-class EncryptionServiceTest {
-
-    private lateinit var encryptionService: EncryptionService
+@RunWith(AndroidJUnit4::class)
+class AccountEncryptionServiceTest {
 
     @Before
     fun setUp() {
         HashingService.hashPassword("TestPassword", "SomeSalt")
-        encryptionService = EncryptionService()
     }
 
     @Test
@@ -31,8 +30,8 @@ class EncryptionServiceTest {
         )
 
         // When :
-        val encryptedAccount = encryptionService.encryptAccount(account)
-        val result = encryptionService.decryptAccount((encryptedAccount as Result.Success).data)
+        val encryptedAccount = AccountEncryptionService.encrypt(account)
+        val result = AccountEncryptionService.decrypt((encryptedAccount as Result.Success).data)
 
         // Then :
         assertThat(result.succeeded, `is`(true))

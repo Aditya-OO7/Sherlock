@@ -8,24 +8,32 @@ import com.adityaoo7.sherlock.data.repository.AccountsRepository
 import com.adityaoo7.sherlock.services.EncryptionService
 import kotlinx.coroutines.launch
 
-class HomeViewModel(accountsRepository: AccountsRepository) : ViewModel() {
+class HomeViewModel(
+    accountsRepository: AccountsRepository,
+    private val encryptionService: EncryptionService
+) : ViewModel() {
 
     private val _items: LiveData<List<LoginAccount>> = accountsRepository
         .observeAccounts()
-        .switchMap { decryptAccounts(it) }
+        .switchMap {
+            decryptAccounts(it)
+        }
 
     val items: LiveData<List<LoginAccount>> = _items
 
     private fun decryptAccounts(accountsResult: Result<List<LoginAccount>>): LiveData<List<LoginAccount>> {
         val result = MutableLiveData<List<LoginAccount>>()
-
         if (accountsResult is Result.Success) {
             viewModelScope.launch {
                 val decryptedAccounts = ArrayList<LoginAccount>()
                 accountsResult.data.forEach { account ->
-                    val resultDecryptedAccount = EncryptionService().decryptAccount(account)
+                    val resultDecryptedAccount = encryptionService.decrypt(account)
                     if (resultDecryptedAccount is Result.Success) {
                         decryptedAccounts.add(resultDecryptedAccount.data)
+                    } else {
+                        decryptedAccounts.clear()
+                        _snackbarText.value = R.string.account_decrypt_failed
+                        return@forEach
                     }
                 }
                 result.value = decryptedAccounts

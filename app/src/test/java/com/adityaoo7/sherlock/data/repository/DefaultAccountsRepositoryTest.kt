@@ -1,10 +1,10 @@
 package com.adityaoo7.sherlock.data.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.adityaoo7.sherlock.MainCoroutineRule
+import com.adityaoo7.sherlock.util.MainCoroutineRule
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
-import com.adityaoo7.sherlock.data.getOrAwaitValue
+import com.adityaoo7.sherlock.util.getOrAwaitValue
 import com.adityaoo7.sherlock.data.source.FakeDataSource
 import com.adityaoo7.sherlock.data.succeeded
 import kotlinx.coroutines.Dispatchers

@@ -6,7 +6,7 @@ import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 
 class FakeDataSource(
-    var accounts: MutableList<LoginAccount>? = mutableListOf()
+    private var accounts: MutableList<LoginAccount>? = mutableListOf()
 ) : AccountsDataSource {
 
     override fun observeAccounts(): LiveData<Result<List<LoginAccount>>> {

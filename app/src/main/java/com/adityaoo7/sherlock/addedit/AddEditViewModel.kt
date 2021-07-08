@@ -12,7 +12,10 @@ import com.adityaoo7.sherlock.services.EncryptionService
 import kotlinx.coroutines.launch
 import java.lang.RuntimeException
 
-class AddEditViewModel(private val accountsRepository: AccountsRepository): ViewModel() {
+class AddEditViewModel(
+    private val accountsRepository: AccountsRepository,
+    private val encryptionService: EncryptionService
+    ): ViewModel() {
 
     val name = MutableLiveData<String>()
     val userName = MutableLiveData<String>()
@@ -70,7 +73,7 @@ class AddEditViewModel(private val accountsRepository: AccountsRepository): View
     }
 
     private fun onAccountLoaded(account: LoginAccount) {
-        val result = EncryptionService().decryptAccount(account)
+        val result = encryptionService.decrypt(account)
         if (result is Result.Success) {
             val decryptedAccount = result.data
             name.value = decryptedAccount.name
@@ -124,7 +127,7 @@ class AddEditViewModel(private val accountsRepository: AccountsRepository): View
     }
 
     private fun createAccount(newAccount: LoginAccount) = viewModelScope.launch {
-        val result = EncryptionService().encryptAccount(newAccount)
+        val result = encryptionService.encrypt(newAccount)
         if (result is Result.Success) {
             val encryptedAccount = result.data
             accountsRepository.saveAccount(encryptedAccount)
@@ -140,7 +143,7 @@ class AddEditViewModel(private val accountsRepository: AccountsRepository): View
             throw RuntimeException("updateAccount() was called but account is new")
         }
         viewModelScope.launch {
-            val result = EncryptionService().encryptAccount(account)
+            val result = encryptionService.encrypt(account)
             if (result is Result.Success) {
                 val encryptedAccount = result.data
                 accountsRepository.updateAccount(encryptedAccount)

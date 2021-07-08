@@ -33,7 +33,9 @@ class AccountPreferencesManagerTest {
 
     @After
     fun tearDown() {
-        accountPreferencesManager.clearAll()
+        accountPreferencesManager.putVerificationAccount(LoginAccount())
+        accountPreferencesManager.putIsRegistered(false)
+        accountPreferencesManager.putSalt("")
     }
 
     @Test
@@ -70,5 +72,17 @@ class AccountPreferencesManagerTest {
         assertThat(result.succeeded, `is`(true))
         result as Result.Success
         assertThat(result.data, `is`(salt))
+    }
+
+    @Test
+    fun putIsRegisteredAndGetIsRegistered_returnIsRegistered() {
+        // When :
+        accountPreferencesManager.putIsRegistered(true)
+        val result = accountPreferencesManager.getIsRegistered()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(true))
     }
 }

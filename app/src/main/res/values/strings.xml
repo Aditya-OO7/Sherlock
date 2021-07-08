@@ -10,6 +10,7 @@
     <string name="pref_acc_uri_key">Verification_Account_Uri</string>
     <string name="pref_acc_note_key">Verification_Account_Note</string>
     <string name="pref_salt_key">Salt_Key</string>
+    <string name="pref_auth_state_key">Is_Registered</string>
 
     <string name="save_success">Account Saved Successfully!</string>
     <string name="empty_account">You cannot save empty account!</string>
@@ -17,5 +18,11 @@
     <string name="account_decrypt_failed">Failed to Retrieve Account</string>
     <string name="account_encrypt_failed">Failed to Save Account</string>
     <string name="loading_accounts_error">Error while loading accounts</string>
+
+    <string name="wrong_password_pattern">Invalid Password Pattern</string>
+    <string name="auth_process_error">Error while processing Authentication</string>
+    <string name="incorrect_password">Password Incorrect!</string>
+    <string name="auth_success">Authenticated Successfully!</string>
+    <string name="register_success">Registered Successfully!</string>
 
 </resources>

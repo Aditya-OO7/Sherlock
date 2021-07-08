@@ -10,7 +10,7 @@ import com.adityaoo7.sherlock.data.source.SharedPreferencesManager
 class AccountPreferencesManager(
     private val applicationContext: Context,
     prefFileKey: String
-): SharedPreferencesManager {
+) : SharedPreferencesManager {
 
     private val sharedPref: SharedPreferences = applicationContext.getSharedPreferences(
         prefFileKey,
@@ -21,7 +21,10 @@ class AccountPreferencesManager(
         @Volatile
         private var INSTANCE: AccountPreferencesManager? = null
 
-        fun getInstance(applicationContext: Context, prefFileKey: String): AccountPreferencesManager {
+        fun getInstance(
+            applicationContext: Context,
+            prefFileKey: String
+        ): AccountPreferencesManager {
             val checkInstance = INSTANCE
             if (checkInstance != null) {
                 return checkInstance
@@ -61,7 +64,8 @@ class AccountPreferencesManager(
     override fun getVerificationAccount(): Result<LoginAccount> {
         val account = LoginAccount()
 
-        val accId = sharedPref.getString(applicationContext.getString(R.string.pref_acc_id_key), null)
+        val accId =
+            sharedPref.getString(applicationContext.getString(R.string.pref_acc_id_key), null)
 
         if (accId == null) {
             return Result.Error(Exception("Account Not Found!"))
@@ -116,10 +120,19 @@ class AccountPreferencesManager(
         }
     }
 
-    override fun clearAll() {
+    override fun putIsRegistered(state: Boolean) {
         with(sharedPref.edit()) {
-            clear()
+            putBoolean(applicationContext.getString(R.string.pref_auth_state_key), state)
             apply()
         }
+    }
+
+    override fun getIsRegistered(): Result<Boolean> {
+        val authState = sharedPref.getBoolean(
+            applicationContext.getString(R.string.pref_auth_state_key),
+            false
+        )
+
+        return Result.Success(authState)
     }
 }

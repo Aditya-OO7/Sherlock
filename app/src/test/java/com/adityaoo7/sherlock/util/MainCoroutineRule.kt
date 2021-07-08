@@ -1,4 +1,4 @@
-package com.adityaoo7.sherlock
+package com.adityaoo7.sherlock.util
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -10,8 +10,8 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class MainCoroutineRuleAndroid(
-    val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+class MainCoroutineRule(
+    private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
 ) : TestWatcher(), TestCoroutineScope by TestCoroutineScope(dispatcher) {
 
     override fun starting(description: Description?) {

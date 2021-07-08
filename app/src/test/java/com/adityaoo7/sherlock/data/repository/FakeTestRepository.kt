@@ -50,7 +50,7 @@ class FakeTestRepository : AccountsRepository {
                 is Result.Loading -> Result.Loading
                 is Result.Error -> Result.Error(accounts.exception)
                 is Result.Success -> {
-                    val account = accounts.data.firstOrNull() { it.id == accountID }
+                    val account = accounts.data.firstOrNull { it.id == accountID }
                         ?: return@map Result.Error(
                             Exception("Not Found")
                         )
