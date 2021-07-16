@@ -7,17 +7,18 @@ import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.source.shared.FakeSharedPreferencesManager
 import com.adityaoo7.sherlock.data.succeeded
 import com.adityaoo7.sherlock.services.FakeEncryptionService
+import com.adityaoo7.sherlock.util.MainCoroutineRule
 import com.adityaoo7.sherlock.util.VerificationAccount
 import com.adityaoo7.sherlock.util.getOrAwaitValue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.nullValue
+import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
+@ExperimentalCoroutinesApi
 class AuthenticationViewModelTest {
 
     private lateinit var authenticationViewModel: AuthenticationViewModel
@@ -26,6 +27,10 @@ class AuthenticationViewModelTest {
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var mainCoroutineRule = MainCoroutineRule()
 
     @Before
     fun setUp() {
@@ -57,19 +62,37 @@ class AuthenticationViewModelTest {
         // Then :
         assertThat(result, `is`(R.string.wrong_password_pattern))
     }
+
     @Test
     fun onAuthenticationStateError_setsSnackbarTextAuthProcessError() {
         // Given :
         sharedPreferencesManager.setIsRegisteredShouldReturnError(true)
         authenticationViewModel.password.value = "Password@123"
-        
+        authenticationViewModel.confirmPassword.value = "Password@123"
+
         // When :
         authenticationViewModel.onPasswordSubmit()
 
         val result = authenticationViewModel.snackbarText.getOrAwaitValue()
 
         // Then :
-        assertThat(result, `is`(R.string.auth_process_error))
+        assertThat(result, `is`(R.string.register_state_not_found))
+    }
+
+    @Test
+    fun onRegisterAndConfirmPasswordWrong_setsSnackbarTextPasswordNotMatch() {
+        // Given :
+        sharedPreferencesManager.putIsRegistered(false)
+
+        // When :
+        authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123Wrong"
+
+        authenticationViewModel.onPasswordSubmit()
+        val result = authenticationViewModel.snackbarText.getOrAwaitValue()
+
+        // Then :
+        assertThat(result, `is`(R.string.password_not_match))
     }
 
     @Test
@@ -77,6 +100,7 @@ class AuthenticationViewModelTest {
         // Given :
         sharedPreferencesManager.putIsRegistered(false)
         authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
 
         // When :
         authenticationViewModel.onPasswordSubmit()
@@ -93,6 +117,7 @@ class AuthenticationViewModelTest {
         // Given :
         sharedPreferencesManager.putIsRegistered(false)
         authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
 
         // When :
         authenticationViewModel.onPasswordSubmit()
@@ -103,10 +128,28 @@ class AuthenticationViewModelTest {
     }
 
     @Test
+    fun onRegister_storesSalt() {
+        // Given :
+        sharedPreferencesManager.putIsRegistered(false)
+        authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
+
+        // When :
+        authenticationViewModel.onPasswordSubmit()
+        val result = sharedPreferencesManager.getSalt()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(instanceOf(String::class.java)))
+    }
+
+    @Test
     fun onRegister_setsSnackbarTextRegisterSuccess() {
         // Given :
         sharedPreferencesManager.putIsRegistered(false)
         authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
 
         // When :
         authenticationViewModel.onPasswordSubmit()
@@ -114,6 +157,25 @@ class AuthenticationViewModelTest {
 
         // Then :
         assertThat(result, `is`(R.string.register_success))
+    }
+
+    @Test
+    fun hashPassword_loading() {
+        // Given :
+        sharedPreferencesManager.putIsRegistered(false)
+        authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
+
+        mainCoroutineRule.pauseDispatcher()
+
+        // When :
+        authenticationViewModel.onPasswordSubmit()
+
+        assertThat(authenticationViewModel.dataLoading.getOrAwaitValue(), `is`(true))
+
+        mainCoroutineRule.resumeDispatcher()
+
+        assertThat(authenticationViewModel.dataLoading.getOrAwaitValue(), `is`(false))
     }
 
     @Test
@@ -135,6 +197,7 @@ class AuthenticationViewModelTest {
     fun onLoginAndIncorrectPassword_setsSnackbarTextIncorrectPassword() {
         // Given :
         sharedPreferencesManager.putIsRegistered(true)
+        sharedPreferencesManager.putSalt("SomSalt")
         authenticationViewModel.password.value = "Password@432"
         encryptionService.setShouldReturnDifferentAccount(true)
 
@@ -150,6 +213,7 @@ class AuthenticationViewModelTest {
     fun onLogin_setsSnackbarTextAuthSuccess() {
         // Given :
         sharedPreferencesManager.putIsRegistered(true)
+        sharedPreferencesManager.putSalt("SomSalt")
         authenticationViewModel.password.value = "Password@123"
         sharedPreferencesManager.putVerificationAccount(VerificationAccount.instance)
 
@@ -165,6 +229,7 @@ class AuthenticationViewModelTest {
     fun onLogin_setsNavigateToHomeScreenTrue() {
         // Given :
         sharedPreferencesManager.putIsRegistered(true)
+        sharedPreferencesManager.putSalt("SomSalt")
         authenticationViewModel.password.value = "Password@123"
         sharedPreferencesManager.putVerificationAccount(VerificationAccount.instance)
 
@@ -180,6 +245,7 @@ class AuthenticationViewModelTest {
     fun onRegisterAndOnLogin_setsSnackbarTextAuthSuccess() {
         // Given :
         authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
         sharedPreferencesManager.putIsRegistered(false)
 
         // When :

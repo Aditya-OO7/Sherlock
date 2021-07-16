@@ -5,7 +5,7 @@ import com.adityaoo7.sherlock.data.Result
 
 interface EncryptionService {
 
-    fun encrypt(account: LoginAccount): Result<LoginAccount>
+    suspend fun encrypt(account: LoginAccount): Result<LoginAccount>
 
-    fun decrypt(account: LoginAccount): Result<LoginAccount>
+    suspend fun decrypt(account: LoginAccount): Result<LoginAccount>
 }

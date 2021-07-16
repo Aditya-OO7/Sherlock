@@ -4,13 +4,14 @@ import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.source.SharedPreferencesManager
 
-class FakeSharedPreferencesManager : SharedPreferencesManager {
+class FakeSharedPreferencesManagerAndroid : SharedPreferencesManager {
 
-    private var isRegistered: Boolean? = null
-    private var verificationAccount: LoginAccount? = null
-    private var saltStr: String? = null
+    private var isRegistered:Boolean? = null
+    private var verificationAccount:LoginAccount? = null
+    private var saltStr:String? = null
 
-    fun init(state: Boolean, vAccount: LoginAccount, salt: String) {
+    // TODO: remove if not needed
+    fun init(state: Boolean, vAccount:LoginAccount, salt:String) {
         isRegistered = state
         verificationAccount = vAccount
         saltStr = salt

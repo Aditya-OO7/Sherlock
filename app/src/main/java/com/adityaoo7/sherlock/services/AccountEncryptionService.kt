@@ -11,7 +11,7 @@ const val SIZE_OF_IV = 12
 
 object AccountEncryptionService : EncryptionService {
 
-    override fun encrypt(account: LoginAccount): Result<LoginAccount> {
+    override suspend fun encrypt(account: LoginAccount): Result<LoginAccount> {
         val key = HashingService.getKey()
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val encryptedAccount = LoginAccount(id = account.id)
@@ -20,7 +20,7 @@ object AccountEncryptionService : EncryptionService {
 
         val listOfEncryptedItems = ArrayList<String>()
 
-        listOfItemsToEncrypt.forEach {item ->
+        listOfItemsToEncrypt.forEach { item ->
             cipher.init(Cipher.ENCRYPT_MODE, key)
             val cipherText = cipher.doFinal(item.toByteArray())
             val iv = cipher.iv
@@ -39,7 +39,7 @@ object AccountEncryptionService : EncryptionService {
         return Result.Success(encryptedAccount)
     }
 
-    override fun decrypt(account: LoginAccount): Result<LoginAccount> {
+    override suspend fun decrypt(account: LoginAccount): Result<LoginAccount> {
         val key = HashingService.getKey()
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val decryptedAccount = LoginAccount(id = account.id)

@@ -3,7 +3,7 @@ package com.adityaoo7.sherlock.services
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 
-object FakeEncryptionService : EncryptionService {
+object FakeEncryptionServiceAndroid : EncryptionService {
 
     private var shouldReturnError = false
 

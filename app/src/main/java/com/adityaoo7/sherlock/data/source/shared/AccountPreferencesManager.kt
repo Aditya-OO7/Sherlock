@@ -9,39 +9,13 @@ import com.adityaoo7.sherlock.data.source.SharedPreferencesManager
 
 class AccountPreferencesManager(
     private val applicationContext: Context,
-    prefFileKey: String
+    preferencesFileKey: String
 ) : SharedPreferencesManager {
 
     private val sharedPref: SharedPreferences = applicationContext.getSharedPreferences(
-        prefFileKey,
+        preferencesFileKey,
         Context.MODE_PRIVATE
     )
-
-    companion object {
-        @Volatile
-        private var INSTANCE: AccountPreferencesManager? = null
-
-        fun getInstance(
-            applicationContext: Context,
-            prefFileKey: String
-        ): AccountPreferencesManager {
-            val checkInstance = INSTANCE
-            if (checkInstance != null) {
-                return checkInstance
-            }
-
-            return synchronized(this) {
-                val checkInstanceAgain = INSTANCE
-                if (checkInstanceAgain != null) {
-                    checkInstanceAgain
-                } else {
-                    val instance = AccountPreferencesManager(applicationContext, prefFileKey)
-                    INSTANCE = instance
-                    instance
-                }
-            }
-        }
-    }
 
     override fun putVerificationAccount(account: LoginAccount) {
         with(sharedPref.edit()) {
@@ -73,28 +47,28 @@ class AccountPreferencesManager(
             account.id = accId
             account.name = sharedPref.getString(
                 applicationContext.getString(R.string.pref_acc_name_key),
-                "-"
+                null
             ) ?: "-"
 
             account.userName =
                 sharedPref.getString(
                     applicationContext.getString(R.string.pref_acc_user_name_key),
-                    "-"
-                ) ?: "-"
+                    null
+                ) ?: ""
 
             account.password = sharedPref.getString(
                 applicationContext.getString(R.string.pref_acc_password_key),
-                "-"
-            ) ?: "-"
+                null
+            ) ?: ""
 
             account.uri = sharedPref.getString(
                 applicationContext.getString(R.string.pref_acc_uri_key),
-                "-"
+                null
             ) ?: "-"
 
             account.note = sharedPref.getString(
                 applicationContext.getString(R.string.pref_acc_note_key),
-                "-"
+                null
             ) ?: "-"
 
             return Result.Success(account)

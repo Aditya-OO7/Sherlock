@@ -86,7 +86,7 @@ class AddEditViewModelTest {
     fun startWithExistingAccountAndAccountNotFound_setsSnackbarTextNoAccountFound() {
         // Given :
         accountsRepository.setReturnError(true)
-        
+
         // When :
         addEditViewModel.start(account1.id)
 
@@ -100,7 +100,7 @@ class AddEditViewModelTest {
     fun startWithExistingAccountAndDecryptionError_setsSnackbarTextAccountDecryptFailed() {
         // Given :
         encryptionService.setShouldReturnError(true)
-        
+
         // When :
         addEditViewModel.start(account1.id)
 
@@ -159,7 +159,7 @@ class AddEditViewModelTest {
     fun saveNewAccountAndEncryptionError_setsSnackbarTextAccountEncryptionFailed() {
         // Given :
         encryptionService.setShouldReturnError(true)
-        
+
         // When :
         addEditViewModel.start(null)
 

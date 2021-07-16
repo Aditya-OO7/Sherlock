@@ -176,6 +176,6 @@ class AccountsLocalDataSourceTest {
         val result = localDataSource.getAccount(account1.id)
 
         // Then :
-        assertThat(result, `is`(instanceOf(Result.Error::class.java)) )
+        assertThat(result, `is`(instanceOf(Result.Error::class.java)))
     }
 }

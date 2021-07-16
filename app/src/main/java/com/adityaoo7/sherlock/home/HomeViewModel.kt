@@ -5,6 +5,7 @@ import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.repository.AccountsRepository
+import com.adityaoo7.sherlock.data.succeeded
 import com.adityaoo7.sherlock.services.EncryptionService
 import kotlinx.coroutines.launch
 
@@ -15,43 +16,56 @@ class HomeViewModel(
 
     private val _items: LiveData<List<LoginAccount>> = accountsRepository
         .observeAccounts()
-        .switchMap {
-            decryptAccounts(it)
-        }
+        .switchMap { decryptAccounts(it) }
 
     val items: LiveData<List<LoginAccount>> = _items
 
-    private fun decryptAccounts(accountsResult: Result<List<LoginAccount>>): LiveData<List<LoginAccount>> {
-        val result = MutableLiveData<List<LoginAccount>>()
-        if (accountsResult is Result.Success) {
+    val empty: LiveData<Boolean> = Transformations.map(_items) { accountsList ->
+        accountsList.isEmpty()
+    }
+
+    private fun decryptAccounts(result: Result<List<LoginAccount>>): LiveData<List<LoginAccount>> {
+        val accountsList = MutableLiveData<List<LoginAccount>>()
+        if (result.succeeded) {
+            _dataLoading.postValue(true)
+
             viewModelScope.launch {
                 val decryptedAccounts = ArrayList<LoginAccount>()
-                accountsResult.data.forEach { account ->
+
+                (result as Result.Success).data.forEach { account ->
                     val resultDecryptedAccount = encryptionService.decrypt(account)
-                    if (resultDecryptedAccount is Result.Success) {
-                        decryptedAccounts.add(resultDecryptedAccount.data)
+
+                    if (resultDecryptedAccount.succeeded) {
+                        decryptedAccounts.add((resultDecryptedAccount as Result.Success).data)
                     } else {
                         decryptedAccounts.clear()
-                        _snackbarText.value = R.string.account_decrypt_failed
+                        _snackbarText.postValue(R.string.account_decrypt_failed)
                         return@forEach
                     }
                 }
-                result.value = decryptedAccounts
+
+                accountsList.postValue(decryptedAccounts)
+                _dataLoading.postValue(false)
             }
+
         } else {
-            result.value = emptyList()
-            _snackbarText.value = R.string.loading_accounts_error
+            accountsList.postValue(emptyList())
+            _snackbarText.postValue(R.string.loading_accounts_error)
         }
-        return result
+        return accountsList
     }
 
-    private val _dataLoading = MutableLiveData<Boolean>()
+    private val _dataLoading = MutableLiveData(false)
     val dataLoading: LiveData<Boolean> = _dataLoading
 
-    private val _snackbarText = MutableLiveData<Int>()
-    val snackbarText: LiveData<Int> = _snackbarText
+    private val _snackbarText = MutableLiveData<Int?>()
+    val snackbarText: LiveData<Int?> = _snackbarText
 
-    private val _createNewAccount = MutableLiveData<Boolean>()
+    fun doneShowingSnackbar() {
+        _snackbarText.value = null
+    }
+
+    private val _createNewAccount = MutableLiveData(false)
     val createNewAccount: LiveData<Boolean> = _createNewAccount
 
     fun doneCreatingNewAccount() {
@@ -72,4 +86,13 @@ class HomeViewModel(
     fun openAccount(accountId: String) {
         _openExistingAccount.value = accountId
     }
+}
+
+@Suppress("UNCHECKED_CAST")
+class HomeViewModelFactory(
+    private val repository: AccountsRepository,
+    private val encryptionService: EncryptionService
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel?> create(modelClass: Class<T>) =
+        (HomeViewModel(repository, encryptionService) as T)
 }

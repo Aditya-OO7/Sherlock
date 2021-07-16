@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="account"
+            type="com.adityaoo7.sherlock.data.LoginAccount" />
+
+        <variable
+            name="viewModel"
+            type="com.adityaoo7.sherlock.home.HomeViewModel" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:onClick="@{() -> viewModel.openAccount(account.id)}"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@{account.titleForList}"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            tools:text="Account Name" />
+
+    </LinearLayout>
+
+</layout>

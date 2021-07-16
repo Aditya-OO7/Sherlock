@@ -1,8 +1,6 @@
 package com.adityaoo7.sherlock.authentication
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.source.SharedPreferencesManager
@@ -11,6 +9,7 @@ import com.adityaoo7.sherlock.services.EncryptionService
 import com.adityaoo7.sherlock.services.HashingService
 import com.adityaoo7.sherlock.util.ValidationUtil
 import com.adityaoo7.sherlock.util.VerificationAccount
+import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 
@@ -19,8 +18,8 @@ class AuthenticationViewModel(
     private val encryptionService: EncryptionService
 ) : ViewModel() {
 
-    private val _isRegistered = MutableLiveData<Boolean?>()
-    val isRegistered: LiveData<Boolean?> = _isRegistered
+    private val _isRegistered = MutableLiveData<Boolean>()
+    val isRegistered: LiveData<Boolean> = _isRegistered
 
     init {
         getIsRegistered()
@@ -28,14 +27,20 @@ class AuthenticationViewModel(
 
     private fun getIsRegistered() {
         val result = sharedPreferencesManager.getIsRegistered()
-        if (result is Result.Success) {
-            _isRegistered.value = result.data
+        if (result.succeeded) {
+            val registerState = (result as Result.Success).data
+            _isRegistered.postValue(registerState)
         } else {
-            _isRegistered.value = null
+            _snackbarText.postValue(R.string.register_state_not_found)
         }
     }
 
     val password = MutableLiveData<String>()
+
+    val confirmPassword = MutableLiveData<String>()
+
+    private val _dataLoading = MutableLiveData(false)
+    val dataLoading: LiveData<Boolean> = _dataLoading
 
     private val _snackbarText = MutableLiveData<Int?>()
     val snackbarText: LiveData<Int?> = _snackbarText
@@ -51,21 +56,20 @@ class AuthenticationViewModel(
         _navigateToHomeScreen.value = false
     }
 
-    private fun saveVerificationAccount() {
-        val encryptedVerificationAccount =
-            encryptionService.encrypt(VerificationAccount.instance)
-        if (encryptedVerificationAccount.succeeded && encryptedVerificationAccount is Result.Success) {
-            sharedPreferencesManager.putVerificationAccount(encryptedVerificationAccount.data)
+    private suspend fun saveVerificationAccount() {
+        val result = encryptionService.encrypt(VerificationAccount.instance)
+        if (result.succeeded) {
+            sharedPreferencesManager.putVerificationAccount((result as Result.Success).data)
         }
     }
 
-    private fun matchVerificationAccount(): Boolean {
-        val account = sharedPreferencesManager.getVerificationAccount()
+    private suspend fun matchVerificationAccount(): Boolean {
+        val result = sharedPreferencesManager.getVerificationAccount()
 
-        return if (account is Result.Success) {
-            val decryptedAccount = encryptionService.decrypt(account.data)
-            if (decryptedAccount is Result.Success) {
-                decryptedAccount.data == VerificationAccount.instance
+        return if (result.succeeded) {
+            val resultOfDecryption = encryptionService.decrypt((result as Result.Success).data)
+            if (resultOfDecryption.succeeded) {
+                (resultOfDecryption as Result.Success).data == VerificationAccount.instance
             } else {
                 false
             }
@@ -85,9 +89,13 @@ class AuthenticationViewModel(
         getIsRegistered()
         val validPassword = ValidationUtil.validatePassword(password.value)
         if (validPassword) {
-            when(_isRegistered.value) {
-                true -> { login() }
-                false -> { register() }
+            when (_isRegistered.value) {
+                true -> {
+                    login()
+                }
+                false -> {
+                    register()
+                }
                 else -> {
                     _snackbarText.value = R.string.auth_process_error
                 }
@@ -98,29 +106,60 @@ class AuthenticationViewModel(
     }
 
     private fun login() {
-        val salt = sharedPreferencesManager.getSalt()
-        if (salt is Result.Success) {
 
-            HashingService.hashPassword(password.value!!, salt.data)
-            val verifiedUser = matchVerificationAccount()
+        _dataLoading.value = true
 
-            if (verifiedUser) {
-                _snackbarText.value = R.string.auth_success
-                _navigateToHomeScreen.value = true
+        viewModelScope.launch {
+            val result = sharedPreferencesManager.getSalt()
+
+            if (result.succeeded) {
+                HashingService.hashPassword(password.value!!, (result as Result.Success).data)
+
+                val verifiedUser = matchVerificationAccount()
+
+                if (verifiedUser) {
+                    _snackbarText.postValue(R.string.auth_success)
+                    _navigateToHomeScreen.postValue(true)
+                } else {
+                    _snackbarText.postValue(R.string.incorrect_password)
+                }
             } else {
-                _snackbarText.value = R.string.incorrect_password
+                _snackbarText.postValue(R.string.auth_process_error)
             }
-        } else {
-            _snackbarText.value = R.string.auth_process_error
+            _dataLoading.postValue(false)
         }
     }
 
     private fun register() {
-        HashingService.hashPassword(password.value!!, getSalt())
-        saveVerificationAccount()
+        if (password.value != confirmPassword.value) {
+            _snackbarText.value = R.string.password_not_match
+            return
+        }
 
-        sharedPreferencesManager.putIsRegistered(true)
-        getIsRegistered()
-        _snackbarText.value = R.string.register_success
+        _dataLoading.value = true
+
+        viewModelScope.launch {
+            val salt = getSalt()
+            HashingService.hashPassword(password.value!!, salt)
+
+            saveVerificationAccount()
+
+            sharedPreferencesManager.apply {
+                putIsRegistered(true)
+                putSalt(salt)
+            }
+            _snackbarText.postValue(R.string.register_success)
+            getIsRegistered()
+            _dataLoading.postValue(false)
+        }
     }
+}
+
+@Suppress("UNCHECKED_CAST")
+class AuthenticationViewModelFactory(
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val encryptionService: EncryptionService
+) : ViewModelProvider.NewInstanceFactory() {
+    override fun <T : ViewModel?> create(modelClass: Class<T>) =
+        (AuthenticationViewModel(sharedPreferencesManager, encryptionService) as T)
 }

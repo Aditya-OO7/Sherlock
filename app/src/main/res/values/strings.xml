@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Sherlock</string>
 
+    <!--    Shared Preferences keys -->
     <string name="preference_file_key">com.adityaoo7.sherlock.PREFERENCE_FILE_KEY</string>
     <string name="test_preference_file_key">com.adityaoo7.sherlock.TEST_PREFERENCE_FILE_KEY</string>
     <string name="pref_acc_id_key">Verification_Account_Id</string>
@@ -12,6 +13,7 @@
     <string name="pref_salt_key">Salt_Key</string>
     <string name="pref_auth_state_key">Is_Registered</string>
 
+    <!--    For Add Edit Functionality -->
     <string name="save_success">Account Saved Successfully!</string>
     <string name="empty_account">You cannot save empty account!</string>
     <string name="no_account_found">Account Not found</string>
@@ -19,10 +21,43 @@
     <string name="account_encrypt_failed">Failed to Save Account</string>
     <string name="loading_accounts_error">Error while loading accounts</string>
 
+    <string name="account_name_hint">Account Name</string>
+    <string name="user_name_hint">User Name</string>
+    <string name="password_hint">Password</string>
+    <string name="url_hint">website url</string>
+    <string name="note_hint">Add your notes here</string>
+    <string name="save_account_content_description">save account</string>
+
+    <!--    Authentication Messages -->
     <string name="wrong_password_pattern">Invalid Password Pattern</string>
     <string name="auth_process_error">Error while processing Authentication</string>
     <string name="incorrect_password">Password Incorrect!</string>
     <string name="auth_success">Authenticated Successfully!</string>
     <string name="register_success">Registered Successfully!</string>
+    <string name="re_enter_master_password_hint">Re-enter Master Password</string>
+    <string name="enter_master_password_hint">Enter Master Password</string>
+    <string name="register_state_not_found">Unable to determine if you\'re registered or not!</string>
+    <string name="password_not_match">Re-entered Password don\'t match with original one</string>
+
+    <!--    Authentication screen -->
+    <string name="register_heading_text_view">Register</string>
+    <string name="login_heading_text_view">Login</string>
+
+    <string name="register_button_text">Register</string>
+    <string name="login_button_text">Login</string>
+
+
+    <!--    Home Screen -->
+    <string name="fab_content_description">Add new account button</string>
+    <string name="no_accounts_text">No Accounts Found !\nWhy don\'t add one\nby pressing plus button at bottom</string>
+
+    <!--    Detail Screen -->
+    <string name="copy_user_name_content_description">copy user name</string>
+    <string name="copy_password_content_description">copy password</string>
+    <string name="open_url_content_description">open url</string>
+    <string name="toggle_view_password_content_description">toggle view password</string>
+
+    <string name="edit_account_content_description">edit account</string>
+    <string name="delete_account_content_description">delete account</string>
 
 </resources>

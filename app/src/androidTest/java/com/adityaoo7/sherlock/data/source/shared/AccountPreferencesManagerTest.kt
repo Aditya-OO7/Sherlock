@@ -25,7 +25,7 @@ class AccountPreferencesManagerTest {
     @Before
     fun setUp() {
         val context: Context = getApplicationContext()
-        accountPreferencesManager = AccountPreferencesManager.getInstance(
+        accountPreferencesManager = AccountPreferencesManager(
             context,
             context.getString(R.string.test_preference_file_key)
         )

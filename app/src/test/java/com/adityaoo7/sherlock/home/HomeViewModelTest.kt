@@ -56,7 +56,7 @@ class HomeViewModelTest {
 
         accountsRepository.addAccounts(account1, account2)
 
-        homeViewModel = HomeViewModel(accountsRepository,encryptionService)
+        homeViewModel = HomeViewModel(accountsRepository, encryptionService)
     }
 
     @After

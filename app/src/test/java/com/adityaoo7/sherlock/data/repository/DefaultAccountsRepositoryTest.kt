@@ -21,9 +21,9 @@ import org.junit.Test
 class DefaultAccountsRepositoryTest {
 
     private lateinit var localAccountsDataSource: FakeDataSource
-    private lateinit var account1:LoginAccount
-    private lateinit var account2:LoginAccount
-    private lateinit var account3:LoginAccount
+    private lateinit var account1: LoginAccount
+    private lateinit var account2: LoginAccount
+    private lateinit var account3: LoginAccount
 
     private lateinit var accountsRepository: DefaultAccountsRepository
 
@@ -108,13 +108,14 @@ class DefaultAccountsRepositoryTest {
     }
 
     @Test
-    fun getAccountThatIsNotPresent_returnsAccountNotFoundError() = mainCoroutineRule.runBlockingTest {
-        // When :
-        val result = accountsRepository.getAccount(account3.id)
+    fun getAccountThatIsNotPresent_returnsAccountNotFoundError() =
+        mainCoroutineRule.runBlockingTest {
+            // When :
+            val result = accountsRepository.getAccount(account3.id)
 
-        // Then :
-        assertThat(result, `is`(instanceOf(Result.Error::class.java)))
-    }
+            // Then :
+            assertThat(result, `is`(instanceOf(Result.Error::class.java)))
+        }
 
 
     @Test
@@ -162,12 +163,13 @@ class DefaultAccountsRepositoryTest {
     }
 
     @Test
-    fun deleteAccountAndGetAccount_returnsAccountNotFoundError() = mainCoroutineRule.runBlockingTest {
-        // When :
-        accountsRepository.deleteAccount(account2.id)
-        val result = accountsRepository.getAccount(account2.id)
+    fun deleteAccountAndGetAccount_returnsAccountNotFoundError() =
+        mainCoroutineRule.runBlockingTest {
+            // When :
+            accountsRepository.deleteAccount(account2.id)
+            val result = accountsRepository.getAccount(account2.id)
 
-        // Then :
-        assertThat(result, `is`(instanceOf(Result.Error::class.java)))
-    }
+            // Then :
+            assertThat(result, `is`(instanceOf(Result.Error::class.java)))
+        }
 }
