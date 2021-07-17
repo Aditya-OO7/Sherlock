@@ -1,5 +1,6 @@
 package com.adityaoo7.sherlock.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.adityaoo7.sherlock.SherlockApplication
+import com.adityaoo7.sherlock.authentication.AuthenticationActivity
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
@@ -102,7 +104,7 @@ class HomeFragment : Fragment() {
             manager.putVerificationAccount(LoginAccount())
             manager.putSalt("")
             manager.putIsRegistered(false)
-            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToAuthenticationFragment())
+            startActivity(Intent(requireContext(), AuthenticationActivity::class.java))
         }
 
         val viewModel = binding.viewModel

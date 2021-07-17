@@ -1,12 +1,14 @@
 package com.adityaoo7.sherlock.authentication
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import com.adityaoo7.sherlock.MainActivity
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
 import com.adityaoo7.sherlock.databinding.FragmentAuthenticationBinding
@@ -65,9 +67,9 @@ class AuthenticationFragment : Fragment() {
 
         authViewModel.navigateToHomeScreen.observe(viewLifecycleOwner, { navigate ->
             if (navigate) {
-                findNavController().navigate(
-                    AuthenticationFragmentDirections.actionAuthenticationFragmentToHomeFragment()
-                )
+                Toast.makeText(requireContext(), R.string.auth_success, Toast.LENGTH_LONG).show()
+                startActivity(Intent(requireContext(), MainActivity::class.java))
+                requireActivity().finishAffinity()
                 authViewModel.doneNavigating()
             }
         })

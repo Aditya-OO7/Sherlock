@@ -210,22 +210,6 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun onLogin_setsSnackbarTextAuthSuccess() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(true)
-        sharedPreferencesManager.putSalt("SomSalt")
-        authenticationViewModel.password.value = "Password@123"
-        sharedPreferencesManager.putVerificationAccount(VerificationAccount.instance)
-
-        // When :
-        authenticationViewModel.onPasswordSubmit()
-        val result = authenticationViewModel.snackbarText.getOrAwaitValue()
-
-        // Then :
-        assertThat(result, `is`(R.string.auth_success))
-    }
-
-    @Test
     fun onLogin_setsNavigateToHomeScreenTrue() {
         // Given :
         sharedPreferencesManager.putIsRegistered(true)
@@ -239,22 +223,6 @@ class AuthenticationViewModelTest {
 
         // Then :
         assertThat(result, `is`(true))
-    }
-
-    @Test
-    fun onRegisterAndOnLogin_setsSnackbarTextAuthSuccess() {
-        // Given :
-        authenticationViewModel.password.value = "Password@123"
-        authenticationViewModel.confirmPassword.value = "Password@123"
-        sharedPreferencesManager.putIsRegistered(false)
-
-        // When :
-        authenticationViewModel.onPasswordSubmit()
-        authenticationViewModel.onPasswordSubmit()
-        val result = authenticationViewModel.snackbarText.getOrAwaitValue()
-
-        // Then :
-        assertThat(result, `is`(R.string.auth_success))
     }
 
     @Test

@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 class AccountEncryptionServiceTest {
 
     @Before
-    fun setUp() {
+    fun setUp() = runBlockingTest {
         HashingService.hashPassword("TestPassword", "SomeSalt")
     }
 

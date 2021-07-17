@@ -6,7 +6,7 @@ import javax.crypto.spec.PBEKeySpec
 
 object HashingService {
 
-    fun hashPassword(password: String, salt: String) {
+    suspend fun hashPassword(password: String, salt: String) {
 
         val saltBytes = salt.toByteArray()
         val iterations = 1_00_000

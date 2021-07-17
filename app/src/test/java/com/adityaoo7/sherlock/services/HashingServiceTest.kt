@@ -1,5 +1,7 @@
 package com.adityaoo7.sherlock.services
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -8,8 +10,9 @@ import javax.crypto.SecretKey
 
 class HashingServiceTest {
 
+    @ExperimentalCoroutinesApi
     @Before
-    fun setUp() {
+    fun setUp() = runBlockingTest {
         HashingService.hashPassword("TestPassword", "SomeSalt")
     }
 

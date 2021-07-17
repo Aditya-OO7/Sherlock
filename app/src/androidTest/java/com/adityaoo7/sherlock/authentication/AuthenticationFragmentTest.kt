@@ -8,9 +8,13 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.adityaoo7.sherlock.MainActivity
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.ServiceLocator
 import com.adityaoo7.sherlock.data.Result
@@ -29,7 +33,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
@@ -309,6 +312,7 @@ class AuthenticationFragmentTest {
         sharedPreferencesManager.putVerificationAccount(VerificationAccount.instance)
 
         // When :
+        Intents.init()
         val scenario =
             launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -316,6 +320,7 @@ class AuthenticationFragmentTest {
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
+        ServiceLocator.encryptionService = FakeEncryptionServiceAndroid
 
         onView(withId(R.id.enter_password_edit_text)).perform(
             typeText("Password@123"),
@@ -324,9 +329,9 @@ class AuthenticationFragmentTest {
         onView(withId(R.id.submit_button)).perform(click())
 
         // Then :
-        verify(navController).navigate(AuthenticationFragmentDirections.actionAuthenticationFragmentToHomeFragment())
+        intended(hasComponent(MainActivity::class.java.name))
 
-        onView(withText(R.string.auth_success)).check(matches(isDisplayed()))
+        Intents.release()
     }
 
     @Test
@@ -335,7 +340,6 @@ class AuthenticationFragmentTest {
         mainCoroutineRuleAndroid.pauseDispatcher()
         sharedPreferencesManager.putIsRegistered(true)
         sharedPreferencesManager.putSalt("Some Salt")
-        sharedPreferencesManager.putVerificationAccount(VerificationAccount.instance)
 
         // When :
         val scenario =
@@ -366,6 +370,7 @@ class AuthenticationFragmentTest {
         sharedPreferencesManager.putIsRegistered(false)
 
         // When :
+        Intents.init()
         val scenario =
             launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -396,8 +401,8 @@ class AuthenticationFragmentTest {
         onView(withId(R.id.submit_button)).perform(click())
 
         // Then :
-        verify(navController).navigate(AuthenticationFragmentDirections.actionAuthenticationFragmentToHomeFragment())
+        intended(hasComponent(MainActivity::class.java.name))
 
-        onView(withText(R.string.auth_success)).check(matches(isDisplayed()))
+        Intents.release()
     }
 }

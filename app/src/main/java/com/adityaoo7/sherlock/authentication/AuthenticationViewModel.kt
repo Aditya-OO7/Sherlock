@@ -118,7 +118,6 @@ class AuthenticationViewModel(
                 val verifiedUser = matchVerificationAccount()
 
                 if (verifiedUser) {
-                    _snackbarText.postValue(R.string.auth_success)
                     _navigateToHomeScreen.postValue(true)
                 } else {
                     _snackbarText.postValue(R.string.incorrect_password)
