@@ -86,6 +86,17 @@ class HomeViewModel(
     fun openAccount(accountId: String) {
         _openExistingAccount.value = accountId
     }
+
+    private val _resetPassword = MutableLiveData(false)
+    val resetPassword: LiveData<Boolean> = _resetPassword
+
+    fun resetPassword() {
+        _resetPassword.value = true
+    }
+
+    fun doneNavigatingResetPassword() {
+        _resetPassword.value = false
+    }
 }
 
 @Suppress("UNCHECKED_CAST")

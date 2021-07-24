@@ -29,6 +29,10 @@ class AccountsLocalDataSource internal constructor(
         accountDao.insertAccount(account)
     }
 
+    override suspend fun saveAccounts(accounts: List<LoginAccount>) {
+        accountDao.insertAccounts(accounts)
+    }
+
     override suspend fun updateAccount(account: LoginAccount) = withContext<Unit>(ioDispatcher) {
         accountDao.updateAccount(account)
     }
@@ -47,7 +51,19 @@ class AccountsLocalDataSource internal constructor(
             }
         }
 
+    override suspend fun getAccounts(): Result<List<LoginAccount>> = withContext(ioDispatcher) {
+        return@withContext try {
+            Result.Success(accountDao.getAccounts())
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
     override suspend fun deleteAccount(accountID: String) = withContext<Unit>(ioDispatcher) {
         accountDao.deleteAccountById(accountID)
+    }
+
+    override suspend fun deleteAccounts() {
+        accountDao.deleteAccounts()
     }
 }

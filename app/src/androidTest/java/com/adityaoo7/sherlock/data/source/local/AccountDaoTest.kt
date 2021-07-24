@@ -10,8 +10,7 @@ import com.adityaoo7.sherlock.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -83,6 +82,20 @@ class AccountDaoTest {
     }
 
     @Test
+    fun insertAccountsAndGetAccounts() = runBlockingTest {
+        // Given :
+        val accountsList = listOf(account1, account2, account3)
+
+        // When :
+        database.accountDao().insertAccounts(accountsList)
+
+        val result = database.accountDao().getAccounts()
+
+        // Then :
+        assertThat(result, `is`(accountsList))
+    }
+
+    @Test
     fun updateAccountAndGetAccountById() = runBlockingTest {
         // Given :
         database.accountDao().insertAccount(account1)
@@ -142,13 +155,27 @@ class AccountDaoTest {
     }
 
     @Test
-    fun deleteAccountAndGetEmptyListOfAccounts() = runBlockingTest {
+    fun deleteAccount_listOfAccountsDoNotContainDeletedAccount() = runBlockingTest {
         // Given :
-        database.accountDao().insertAccount(account1)
+        database.accountDao().insertAccounts(listOf(account1, account2, account3))
 
         // When :
         database.accountDao().deleteAccountById(account1.id)
         val result = database.accountDao().observeAccounts().getOrAwaitValue()
+
+        // Then :
+        assertThat(result, `is`(not(contains(account1))))
+    }
+
+    @Test
+    fun deleteAccountsAndGetEmptyListOfAccounts() = runBlockingTest {
+        // Given :
+        database.accountDao().insertAccounts(listOf(account1, account2, account3))
+
+        // When :
+        database.accountDao().deleteAccounts()
+
+        val result = database.accountDao().getAccounts()
 
         // Then :
         assertThat(result, `is`(emptyList()))

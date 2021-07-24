@@ -32,6 +32,15 @@ class DefaultAccountsRepository(
         }
     }
 
+    override suspend fun saveAccounts(accounts: List<LoginAccount>) =
+        withContext<Unit>(ioDispatcher) {
+            wrapEspressoIdlingResource {
+                coroutineScope {
+                    launch { localAccountsDataSource.saveAccounts(accounts) }
+                }
+            }
+        }
+
     override suspend fun updateAccount(account: LoginAccount) = withContext<Unit>(ioDispatcher) {
         wrapEspressoIdlingResource {
             coroutineScope {
@@ -40,7 +49,7 @@ class DefaultAccountsRepository(
         }
     }
 
-    override suspend fun deleteAccount(accountID: String)  = withContext<Unit>(ioDispatcher) {
+    override suspend fun deleteAccount(accountID: String) = withContext<Unit>(ioDispatcher) {
         wrapEspressoIdlingResource {
             coroutineScope {
                 launch { localAccountsDataSource.deleteAccount(accountID) }
@@ -48,9 +57,24 @@ class DefaultAccountsRepository(
         }
     }
 
-    override suspend fun getAccount(accountID: String): Result<LoginAccount>  = withContext(ioDispatcher) {
+    override suspend fun deleteAccounts() = withContext<Unit>(ioDispatcher) {
         wrapEspressoIdlingResource {
-            return@withContext localAccountsDataSource.getAccount(accountID)
+            coroutineScope {
+                launch { localAccountsDataSource.deleteAccounts() }
+            }
+        }
+    }
+
+    override suspend fun getAccount(accountID: String): Result<LoginAccount> =
+        withContext(ioDispatcher) {
+            wrapEspressoIdlingResource {
+                return@withContext localAccountsDataSource.getAccount(accountID)
+            }
+        }
+
+    override suspend fun getAccounts(): Result<List<LoginAccount>> = withContext(ioDispatcher) {
+        wrapEspressoIdlingResource {
+            return@withContext localAccountsDataSource.getAccounts()
         }
     }
 }

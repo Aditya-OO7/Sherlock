@@ -17,6 +17,7 @@ import androidx.test.filters.MediumTest
 import com.adityaoo7.sherlock.MainActivity
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.ServiceLocator
+import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.Result
 import com.adityaoo7.sherlock.data.source.shared.FakeSharedPreferencesManagerAndroid
 import com.adityaoo7.sherlock.data.succeeded
@@ -51,6 +52,8 @@ class AuthenticationFragmentTest {
         sharedPreferencesManager = FakeSharedPreferencesManagerAndroid()
         encryptionService = FakeEncryptionServiceAndroid
 
+        sharedPreferencesManager.init(false, LoginAccount(), "")
+
         ServiceLocator.sharedPreferencesManager = sharedPreferencesManager
         ServiceLocator.encryptionService = encryptionService
     }
@@ -73,9 +76,6 @@ class AuthenticationFragmentTest {
 
     @Test
     fun isNotRegistered_setsRegisterScreen() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(false)
-
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -139,9 +139,6 @@ class AuthenticationFragmentTest {
 
     @Test
     fun clickRegisterWithEmptyPasswordFields_returnsSnackbarTextWrongPasswordPattern() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(false)
-
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -155,9 +152,6 @@ class AuthenticationFragmentTest {
 
     @Test
     fun incorrectConfirmPasswordSubmit_returnsSnackbarTextPasswordNotMatch() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(false)
-
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -178,9 +172,6 @@ class AuthenticationFragmentTest {
 
     @Test
     fun successfulRegistration_savesVerificationAccountAndSetsLoginScreen() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(false)
-
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -241,7 +232,6 @@ class AuthenticationFragmentTest {
     fun hashPassword_loading() {
         // Given :
         mainCoroutineRuleAndroid.pauseDispatcher()
-        sharedPreferencesManager.putIsRegistered(false)
 
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
@@ -270,6 +260,7 @@ class AuthenticationFragmentTest {
     fun clickLoginAndSaltNotFound_returnsSnackbarTextAuthProcessError() {
         // Given :
         sharedPreferencesManager.putIsRegistered(true)
+        sharedPreferencesManager.setSaltError(true)
 
         // When :
         launchFragmentInContainer<AuthenticationFragment>(Bundle(), R.style.Theme_Sherlock)
@@ -366,9 +357,6 @@ class AuthenticationFragmentTest {
 
     @Test
     fun registerAndLogin_navigatesToHomeScreen() {
-        // Given :
-        sharedPreferencesManager.putIsRegistered(false)
-
         // When :
         Intents.init()
         val scenario =

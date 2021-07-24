@@ -29,6 +29,10 @@ class FakeDataSource(
         accounts?.add(account)
     }
 
+    override suspend fun saveAccounts(accounts: List<LoginAccount>) {
+        this.accounts?.addAll(accounts)
+    }
+
     override suspend fun updateAccount(account: LoginAccount) {
         var ac = LoginAccount()
         accounts?.forEach { acc ->
@@ -50,6 +54,10 @@ class FakeDataSource(
         return Result.Error(Exception("Account Not Found!"))
     }
 
+    override suspend fun getAccounts(): Result<List<LoginAccount>> {
+        return Result.Success(accounts ?: emptyList())
+    }
+
     override suspend fun deleteAccount(accountID: String) {
         var ac = LoginAccount()
         accounts?.forEach { acc ->
@@ -58,5 +66,9 @@ class FakeDataSource(
             }
         }
         accounts?.remove(ac)
+    }
+
+    override suspend fun deleteAccounts() {
+        accounts?.clear()
     }
 }

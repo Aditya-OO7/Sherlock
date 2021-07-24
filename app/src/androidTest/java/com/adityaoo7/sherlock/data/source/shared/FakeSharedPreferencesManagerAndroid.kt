@@ -6,12 +6,11 @@ import com.adityaoo7.sherlock.data.source.SharedPreferencesManager
 
 class FakeSharedPreferencesManagerAndroid : SharedPreferencesManager {
 
-    private var isRegistered:Boolean? = null
-    private var verificationAccount:LoginAccount? = null
-    private var saltStr:String? = null
+    private var isRegistered: Boolean? = null
+    private var verificationAccount: LoginAccount? = null
+    private var saltStr: String? = null
 
-    // TODO: remove if not needed
-    fun init(state: Boolean, vAccount:LoginAccount, salt:String) {
+    fun init(state: Boolean, vAccount: LoginAccount, salt: String) {
         isRegistered = state
         verificationAccount = vAccount
         saltStr = salt

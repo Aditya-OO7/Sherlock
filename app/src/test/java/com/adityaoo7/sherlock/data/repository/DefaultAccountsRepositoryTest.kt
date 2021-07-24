@@ -11,8 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -136,6 +135,22 @@ class DefaultAccountsRepositoryTest {
     }
 
     @Test
+    fun saveAccounts_getListOfAllSavedAccounts() = mainCoroutineRule.runBlockingTest {
+        // Given :
+        val accountsList = listOf(account1, account2, account3)
+
+        // When :
+        accountsRepository.saveAccounts(accountsList)
+
+        val result = accountsRepository.getAccounts()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(listOf(account1, account2, account1, account2, account3)))
+    }
+
+    @Test
     fun updateAccountAndGetAccount_returnsUpdatedAccount() = mainCoroutineRule.runBlockingTest {
         // Given :
         val updatedAccount = LoginAccount(
@@ -160,6 +175,39 @@ class DefaultAccountsRepositoryTest {
         assertThat(result.data.password, `is`(updatedAccount.password))
         assertThat(result.data.uri, `is`(updatedAccount.uri))
         assertThat(result.data.note, `is`(updatedAccount.note))
+    }
+
+    @Test
+    fun deleteAccount_listOfAccountsDoNotContainDeletedAccount() =
+        mainCoroutineRule.runBlockingTest {
+            // Given :
+            accountsRepository.saveAccounts(listOf(account1, account2, account3))
+
+            // When :
+            accountsRepository.deleteAccount(account1.id)
+
+            val result = accountsRepository.getAccounts()
+
+            // Then :
+            assertThat(result.succeeded, `is`(true))
+            result as Result.Success
+            assertThat(result.data, `is`(not((contains(account1)))))
+        }
+
+    @Test
+    fun deleteAccounts_returnsEmptyListOfAccounts() = mainCoroutineRule.runBlockingTest {
+        // Given :
+        accountsRepository.saveAccounts(listOf(account1, account2, account3))
+
+        // When :
+        accountsRepository.deleteAccounts()
+
+        val result = accountsRepository.getAccounts()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(emptyList()))
     }
 
     @Test

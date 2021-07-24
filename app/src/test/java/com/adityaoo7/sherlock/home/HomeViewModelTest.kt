@@ -181,4 +181,28 @@ class HomeViewModelTest {
         // Then :
         assertThat(result, `is`(nullValue()))
     }
+
+    @Test
+    fun navigateToResetPassword_setsResetPasswordTrue() {
+        // When :
+        homeViewModel.resetPassword()
+        val result = homeViewModel.resetPassword.getOrAwaitValue()
+
+        // Then :
+        assertThat(result, `is`(true))
+    }
+
+    @Test
+    fun doneNavigatingResetPassword_setsResetPasswordFalse() {
+        // Given :
+        homeViewModel.resetPassword()
+
+        // When :
+        homeViewModel.doneNavigatingResetPassword()
+
+        val result = homeViewModel.resetPassword.getOrAwaitValue()
+
+        // Then :
+        assertThat(result, `is`(false))
+    }
 }

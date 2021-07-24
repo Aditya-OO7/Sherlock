@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">Sherlock</string>
 
-<!--    Fragment titles -->
+    <!--    Fragment titles -->
     <string name="home_fragment_title">Sherlock</string>
     <string name="add_edit_fragment_title">Edit</string>
     <string name="detail_fragment_title">Account Details</string>
+    <string name="reset_password_fragment_title">Reset Password</string>
 
     <!--    Shared Preferences keys -->
     <string name="preference_file_key">com.adityaoo7.sherlock.PREFERENCE_FILE_KEY</string>
@@ -64,5 +65,13 @@
 
     <string name="edit_account_content_description">edit account</string>
     <string name="delete_account_content_description">delete account</string>
+
+    <!--    Reset Password Screen -->
+    <string name="reset_password_menu_item">Reset Password</string>
+    <string name="reset_password_text_view">Reset Password</string>
+    <string name="reset_password_button_text">Reset</string>
+    <string name="confirm_password_edit_text">Re-enter new master password</string>
+    <string name="new_master_password_edit_text">Enter new master password</string>
+    <string name="enter_old_password_hint">Enter old password</string>
 
 </resources>

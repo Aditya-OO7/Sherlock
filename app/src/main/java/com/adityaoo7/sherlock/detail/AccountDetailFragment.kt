@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
 import com.adityaoo7.sherlock.databinding.FragmentAccountDetailBinding
 import com.google.android.material.snackbar.Snackbar
@@ -61,6 +62,7 @@ class AccountDetailFragment : Fragment() {
                 findNavController().navigate(
                     AccountDetailFragmentDirections.actionAccountDetailFragmentToHomeFragment()
                 )
+                findNavController().popBackStack(R.id.accountDetailFragment, true)
                 detailViewModel.doneDeletingAccount()
             }
         })

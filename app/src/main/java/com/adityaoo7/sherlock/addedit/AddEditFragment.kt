@@ -45,6 +45,7 @@ class AddEditFragment : Fragment() {
         addEditViewModel.navigateToHomeScreen.observe(viewLifecycleOwner, { navigate ->
             if (navigate) {
                 findNavController().navigate(AddEditFragmentDirections.actionAddEditFragmentToHomeFragment())
+                findNavController().popBackStack(R.id.addEditFragment, true)
                 addEditViewModel.doneNavigating()
             }
         })

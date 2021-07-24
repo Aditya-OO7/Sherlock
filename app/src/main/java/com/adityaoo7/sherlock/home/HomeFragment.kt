@@ -1,21 +1,19 @@
 package com.adityaoo7.sherlock.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
-import com.adityaoo7.sherlock.authentication.AuthenticationActivity
-import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment : Fragment() {
+
+    private val TAG = HomeFragment::class.java.simpleName
 
     lateinit var binding: FragmentHomeBinding
 
@@ -91,20 +89,18 @@ class HomeFragment : Fragment() {
             }
         })
 
+        homeViewModel.resetPassword.observe(viewLifecycleOwner, { navigateToResetPassword ->
+            if (navigateToResetPassword) {
+                homeViewModel.doneNavigatingResetPassword()
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToResetPasswordFragment()
+                )
+            }
+        })
+
 
         binding.addAccountFab.setOnClickListener {
             homeViewModel.addNewAccount()
-        }
-
-        // TODO: For testing purpose deleting auth data and navigating to auth screen
-
-        binding.gotoAuthButton.setOnClickListener {
-            val manager =
-                (requireContext().applicationContext as SherlockApplication).sharedPreferencesManager
-            manager.putVerificationAccount(LoginAccount())
-            manager.putSalt("")
-            manager.putIsRegistered(false)
-            startActivity(Intent(requireContext(), AuthenticationActivity::class.java))
         }
 
         val viewModel = binding.viewModel
@@ -114,10 +110,23 @@ class HomeFragment : Fragment() {
 
             binding.accountsList.adapter = listAdapter
         } else {
-            Log.d("Home Fragment", "ViewModel not initialized")
+            Log.d(TAG, "ViewModel not initialized")
         }
 
+        setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.home_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.reset_password -> {
+            homeViewModel.resetPassword()
+            true
+        }
+        else -> false
     }
 
 }

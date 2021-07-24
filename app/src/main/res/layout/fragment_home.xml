@@ -72,28 +72,16 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_account_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@string/fab_content_description"
             android:src="@drawable/ic_baseline_add_24"
             app:fabSize="normal"
             app:layout_anchor="@id/accounts_container_layout"
             app:layout_anchorGravity="bottom|right|end" />
-
-        <!--        TODO: For testing purpose navigation button added-->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/goto_auth_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_baseline_delete_24"
-            app:fabSize="normal"
-            app:layout_anchor="@id/accounts_container_layout"
-            app:layout_anchorGravity="bottom|left|end" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

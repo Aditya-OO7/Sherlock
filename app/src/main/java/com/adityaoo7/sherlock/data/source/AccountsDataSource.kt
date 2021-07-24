@@ -11,9 +11,15 @@ interface AccountsDataSource {
 
     suspend fun saveAccount(account: LoginAccount)
 
+    suspend fun saveAccounts(accounts: List<LoginAccount>)
+
     suspend fun updateAccount(account: LoginAccount)
 
     suspend fun getAccount(accountID: String): Result<LoginAccount>
 
+    suspend fun getAccounts(): Result<List<LoginAccount>>
+
     suspend fun deleteAccount(accountID: String)
+
+    suspend fun deleteAccounts()
 }

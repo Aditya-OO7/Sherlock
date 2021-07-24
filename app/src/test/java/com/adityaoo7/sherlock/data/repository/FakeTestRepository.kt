@@ -27,24 +27,23 @@ class FakeTestRepository : AccountsRepository {
         runBlocking { refreshAccounts() }
     }
 
-    private fun refreshAccounts() {
+    private suspend fun refreshAccounts() {
         observableAccounts.value = getAccounts()
     }
 
     override fun observeAccounts(): LiveData<Result<List<LoginAccount>>> {
-        refreshAccounts()
+
+        runBlocking {
+            refreshAccounts()
+        }
         return observableAccounts
     }
 
-    private fun getAccounts(): Result<List<LoginAccount>> {
-        if (shouldReturnError) {
-            return Result.Error(Exception("Test Exception"))
-        }
-        return Result.Success(accountsServiceData.values.toList())
-    }
 
     override fun observeAccount(accountID: String): LiveData<Result<LoginAccount>> {
-        refreshAccounts()
+        runBlocking {
+            refreshAccounts()
+        }
         return observableAccounts.map { accounts ->
             when (accounts) {
                 is Result.Loading -> Result.Loading
@@ -64,12 +63,23 @@ class FakeTestRepository : AccountsRepository {
         accountsServiceData[account.id] = account
     }
 
+    override suspend fun saveAccounts(accounts: List<LoginAccount>) {
+        accounts.forEach { account ->
+            accountsServiceData[account.id] = account
+        }
+    }
+
     override suspend fun updateAccount(account: LoginAccount) {
         accountsServiceData[account.id] = account
     }
 
     override suspend fun deleteAccount(accountID: String) {
         accountsServiceData.remove(accountID)
+        refreshAccounts()
+    }
+
+    override suspend fun deleteAccounts() {
+        accountsServiceData.clear()
         refreshAccounts()
     }
 
@@ -81,5 +91,13 @@ class FakeTestRepository : AccountsRepository {
             return Result.Success(it)
         }
         return Result.Error(Exception("Could not find account"))
+    }
+
+    override suspend fun getAccounts(): Result<List<LoginAccount>> {
+        if (shouldReturnError) {
+            return Result.Error(Exception("Test Exception"))
+        }
+
+        return Result.Success(accountsServiceData.values.toList())
     }
 }

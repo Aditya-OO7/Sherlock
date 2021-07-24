@@ -13,8 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -89,6 +88,22 @@ class AccountsLocalDataSourceTest {
     }
 
     @Test
+    fun saveAccounts_retrieveListOfAccounts() = runBlocking {
+        // Given :
+        val accountsList = listOf(account1, account2, account3)
+
+        // When :
+        localDataSource.saveAccounts(accountsList)
+
+        val result = localDataSource.getAccounts()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(accountsList))
+    }
+
+    @Test
     fun updateAccount_retrieveAccount() = runBlocking {
         // Given :
         localDataSource.saveAccount(account1)
@@ -152,13 +167,28 @@ class AccountsLocalDataSourceTest {
     }
 
     @Test
-    fun deleteAccount_ObserveAccountsReturnsEmptyListOfAccounts() = runBlocking {
+    fun deleteAccount_listOfAccountsDoNotContainDeletedAccount() = runBlocking {
         // Given :
-        localDataSource.saveAccount(account1)
+        localDataSource.saveAccounts(listOf(account1, account2, account3))
 
         // When :
         localDataSource.deleteAccount(account1.id)
         val result = localDataSource.observeAccounts().getOrAwaitValue()
+
+        // Then :
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(not(contains(account1))))
+    }
+
+    @Test
+    fun deleteAccounts_returnsEmptyListOfAccounts() = runBlocking {
+        // Given :
+        localDataSource.saveAccounts(listOf(account1, account2, account3))
+
+        // When :
+        localDataSource.deleteAccounts()
+        val result = localDataSource.getAccounts()
 
         // Then :
         assertThat(result.succeeded, `is`(true))
