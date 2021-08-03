@@ -3,13 +3,19 @@ package com.adityaoo7.sherlock.home
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
 import com.adityaoo7.sherlock.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialElevationScale
+import com.google.android.material.transition.MaterialFadeThrough
+import com.google.android.material.transition.MaterialSharedAxis
 
 class HomeFragment : Fragment() {
 
@@ -26,6 +32,14 @@ class HomeFragment : Fragment() {
 
     private lateinit var listAdapter: AccountsAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enterTransition = MaterialFadeThrough().apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +51,16 @@ class HomeFragment : Fragment() {
             }
 
         binding.lifecycleOwner = this.viewLifecycleOwner
+
+        val viewModel = binding.viewModel
+
+        if (viewModel != null) {
+            listAdapter = AccountsAdapter(viewModel)
+
+            binding.accountsList.adapter = listAdapter
+        } else {
+            Log.d(TAG, "ViewModel not initialized")
+        }
 
         homeViewModel.dataLoading.observe(viewLifecycleOwner, { isLoading ->
             if (isLoading) {
@@ -69,6 +93,14 @@ class HomeFragment : Fragment() {
 
         homeViewModel.createNewAccount.observe(viewLifecycleOwner, { navigateToAdd ->
             if (navigateToAdd) {
+                exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                    duration =
+                        resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+                }
+                reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+                    duration =
+                        resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+                }
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeFragmentToAddEditFragment(
                         null
@@ -80,10 +112,27 @@ class HomeFragment : Fragment() {
 
         homeViewModel.openExistingAccount.observe(viewLifecycleOwner, { accountId ->
             if (accountId != null) {
+                exitTransition = MaterialElevationScale(false).apply {
+                    duration = resources.getInteger(
+                        R.integer.material_motion_duration_long_1
+                    ).toLong()
+                }
+                reenterTransition = MaterialElevationScale(true).apply {
+                    duration = resources.getInteger(
+                        R.integer.material_motion_duration_long_1
+                    ).toLong()
+                }
+                val accountDetailTransition = getString(R.string.account_detail_transition)
+
+                val extras = FragmentNavigatorExtras(
+                    requireView().findViewById<LinearLayout>(R.id.account_item_layout) to accountDetailTransition
+                )
+
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeFragmentToAccountDetailFragment(
                         accountId
-                    )
+                    ),
+                    extras
                 )
                 homeViewModel.doneOpeningExistingAccount()
             }
@@ -91,6 +140,10 @@ class HomeFragment : Fragment() {
 
         homeViewModel.resetPassword.observe(viewLifecycleOwner, { navigateToResetPassword ->
             if (navigateToResetPassword) {
+                exitTransition = MaterialFadeThrough().apply {
+                    duration =
+                        resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+                }
                 homeViewModel.doneNavigatingResetPassword()
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeFragmentToResetPasswordFragment()
@@ -103,18 +156,14 @@ class HomeFragment : Fragment() {
             homeViewModel.addNewAccount()
         }
 
-        val viewModel = binding.viewModel
-
-        if (viewModel != null) {
-            listAdapter = AccountsAdapter(viewModel)
-
-            binding.accountsList.adapter = listAdapter
-        } else {
-            Log.d(TAG, "ViewModel not initialized")
-        }
-
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        requireView().doOnPreDraw { startPostponedEnterTransition() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

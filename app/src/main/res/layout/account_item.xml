@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -14,21 +15,53 @@
 
     </data>
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/account_item_layout"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="3dp"
+        android:clickable="true"
+        android:elevation="3dp"
+        android:focusable="true"
         android:onClick="@{() -> viewModel.openAccount(account.id)}"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:transitionName="@{account.id}">
 
-        <TextView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@{account.titleForList}"
-            android:textAppearance="?attr/textAppearanceHeadline6"
-            tools:text="Account Name" />
+            android:orientation="horizontal"
+            android:padding="10dp">
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/account_name_list_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@{account.titleForList}"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Account Name" />
+
+            <TextView
+                android:id="@+id/user_name_list_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@{account.userName}"
+                app:layout_constraintEnd_toEndOf="@+id/account_name_list_item"
+                app:layout_constraintStart_toStartOf="@+id/account_name_list_item"
+                app:layout_constraintTop_toBottomOf="@+id/account_name_list_item"
+                tools:text="userName" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </layout>

@@ -14,6 +14,7 @@ import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
 import com.adityaoo7.sherlock.databinding.FragmentAddEditBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialSharedAxis
 
 class AddEditFragment : Fragment() {
 
@@ -28,6 +29,18 @@ class AddEditFragment : Fragment() {
             (requireContext().applicationContext as SherlockApplication).accountsRepository,
             (requireContext().applicationContext as SherlockApplication).encryptionService
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+        }
+
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+        }
     }
 
     override fun onCreateView(

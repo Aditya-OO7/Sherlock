@@ -62,6 +62,7 @@
     <string name="copy_password_content_description">copy password</string>
     <string name="open_url_content_description">open url</string>
     <string name="toggle_view_password_content_description">toggle view password</string>
+    <string name="account_detail_transition">account_detail</string>
 
     <string name="edit_account_content_description">edit account</string>
     <string name="delete_account_content_description">delete account</string>
@@ -73,5 +74,7 @@
     <string name="confirm_password_edit_text">Re-enter new master password</string>
     <string name="new_master_password_edit_text">Enter new master password</string>
     <string name="enter_old_password_hint">Enter old password</string>
+    <string name="user_name_copied_toast">User name copied!</string>
+    <string name="password_copied_toast">Password copied!</string>
 
 </resources>

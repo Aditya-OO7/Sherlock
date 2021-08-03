@@ -1,12 +1,20 @@
 package com.adityaoo7.sherlock.detail
 
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -107,6 +115,61 @@ class AccountDetailFragmentTest {
         onView(withId(R.id.password_text_view)).check(matches(withText(account.password)))
         onView(withId(R.id.uri_text_view)).check(matches(withText(account.uri)))
         onView(withId(R.id.note_text_view)).check(matches(withText(account.note)))
+    }
+
+    @Test
+    fun clickOnCopyUserName_addsUserNameToClipBoard() {
+        // When :
+        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
+        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
+
+        onView(withId(R.id.user_name_copy_button)).perform(click())
+
+        val clipBoard =
+            (getApplicationContext() as Context).getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipBoard.primaryClip
+
+        val result = clipData?.getItemAt(0)?.text
+
+        // Then :
+        assertThat(result, `is`(account.userName))
+    }
+
+
+    @Test
+    fun clickOnCopyPassword_addsPasswordToClipBoard() {
+        // When :
+        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
+        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
+
+        onView(withId(R.id.password_copy_button)).perform(click())
+
+        val clipBoard =
+            (getApplicationContext() as Context).getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = clipBoard.primaryClip
+
+        val result = clipData?.getItemAt(0)?.text
+
+        // Then :
+        assertThat(result, `is`(account.password))
+    }
+
+    @Test
+    fun openWebsiteFromUrl_sendsIntentOfActionViewWithGivenUrl() {
+        // Given :
+        Intents.init()
+        // When :
+        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
+        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
+
+        onView(withId(R.id.open_url_button)).perform(click())
+
+        // Then :
+        intended(hasAction(Intent.ACTION_VIEW))
+        val result = android.net.Uri.parse(account.uri)
+        intended(hasData(result))
+
+        Intents.release()
     }
 
     @Test

@@ -11,6 +11,7 @@ import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
 import com.adityaoo7.sherlock.databinding.FragmentResetPasswordBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialFadeThrough
 
 class ResetPasswordFragment : Fragment() {
 
@@ -23,6 +24,14 @@ class ResetPasswordFragment : Fragment() {
             (requireContext().applicationContext as SherlockApplication).encryptionService
 
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        enterTransition = MaterialFadeThrough().apply {
+            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
+        }
     }
 
     override fun onCreateView(
