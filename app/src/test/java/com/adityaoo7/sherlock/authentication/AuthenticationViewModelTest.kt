@@ -10,6 +10,7 @@ import com.adityaoo7.sherlock.services.FakeEncryptionService
 import com.adityaoo7.sherlock.util.MainCoroutineRule
 import com.adityaoo7.sherlock.util.VerificationAccount
 import com.adityaoo7.sherlock.util.getOrAwaitValue
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -41,7 +42,8 @@ class AuthenticationViewModelTest {
 
         authenticationViewModel = AuthenticationViewModel(
             sharedPreferencesManager,
-            encryptionService
+            encryptionService,
+            Dispatchers.Main
         )
     }
 
@@ -121,10 +123,12 @@ class AuthenticationViewModelTest {
 
         // When :
         authenticationViewModel.onPasswordSubmit()
-        val result = authenticationViewModel.isRegistered.getOrAwaitValue()
+        val result = sharedPreferencesManager.getIsRegistered()
 
         // Then :
-        assertThat(result, `is`(true))
+        assertThat(result.succeeded, `is`(true))
+        result as Result.Success
+        assertThat(result.data, `is`(true))
     }
 
     @Test
@@ -145,7 +149,7 @@ class AuthenticationViewModelTest {
     }
 
     @Test
-    fun onRegister_setsSnackbarTextRegisterSuccess() {
+    fun onRegister_setNavigateToLoginScreenTrue() {
         // Given :
         sharedPreferencesManager.putIsRegistered(false)
         authenticationViewModel.password.value = "Password@123"
@@ -153,10 +157,26 @@ class AuthenticationViewModelTest {
 
         // When :
         authenticationViewModel.onPasswordSubmit()
-        val result = authenticationViewModel.snackbarText.getOrAwaitValue()
+        val result = authenticationViewModel.navigateToLoginScreen.getOrAwaitValue()
 
         // Then :
-        assertThat(result, `is`(R.string.register_success))
+        assertThat(result, `is`(true))
+    }
+
+    @Test
+    fun doneNavigatingToLoginScreen() {
+        // Given :
+        sharedPreferencesManager.putIsRegistered(false)
+        authenticationViewModel.password.value = "Password@123"
+        authenticationViewModel.confirmPassword.value = "Password@123"
+        authenticationViewModel.onPasswordSubmit()
+
+        // When :
+        authenticationViewModel.doneNavigatingToLoginScreen()
+        val result = authenticationViewModel.navigateToLoginScreen.getOrAwaitValue()
+
+        // Then :
+        assertThat(result, `is`(false))
     }
 
     @Test
@@ -247,7 +267,7 @@ class AuthenticationViewModelTest {
         authenticationViewModel.onPasswordSubmit()
 
         // When :
-        authenticationViewModel.doneNavigating()
+        authenticationViewModel.doneNavigatingToHomeScreen()
         val result = authenticationViewModel.navigateToHomeScreen.getOrAwaitValue()
 
         // Then :

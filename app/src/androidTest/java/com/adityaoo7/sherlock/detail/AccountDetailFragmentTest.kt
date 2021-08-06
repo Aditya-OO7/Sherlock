@@ -24,10 +24,12 @@ import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.source.local.FakeAndroidTestRepository
 import com.adityaoo7.sherlock.services.FakeEncryptionServiceAndroid
 import com.adityaoo7.sherlock.util.EspressoIdlingResource
+import com.adityaoo7.sherlock.util.MainCoroutineRuleAndroid
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.Matchers.`is`
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -42,6 +44,9 @@ class AccountDetailFragmentTest {
     private lateinit var encryptionService: FakeEncryptionServiceAndroid
 
     private lateinit var account: LoginAccount
+
+    @get:Rule
+    var mainCoroutineRuleAndroid = MainCoroutineRuleAndroid()
 
     @Before
     fun setUp() {
@@ -78,6 +83,35 @@ class AccountDetailFragmentTest {
     }
 
     @Test
+    fun retrieveAccount_displaysAccount() {
+        // When :
+        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
+        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
+
+        // Then :
+        onView(withId(R.id.account_name_text_view)).check(matches(withText(account.name)))
+        onView(withId(R.id.user_name_text_view)).check(matches(withText(account.userName)))
+        onView(withId(R.id.password_text_view)).check(matches(withText(account.password)))
+        onView(withId(R.id.uri_text_view)).check(matches(withText(account.uri)))
+        onView(withId(R.id.note_text_view)).check(matches(withText(account.note)))
+    }
+
+    @Test
+    fun loadingAccount_loading() {
+        // Given :
+        mainCoroutineRuleAndroid.pauseDispatcher()
+
+        // When :
+        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
+        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
+
+        // Then :
+        onView(withId(R.id.loading_account_details_layout)).check(matches(isDisplayed()))
+
+        mainCoroutineRuleAndroid.resumeDispatcher()
+    }
+
+    @Test
     fun retrieveExistingAccountAndAccountNotFound_returnsSnackbarTextNoAccountFound() {
         // Given :
         repository.setReturnError(true)
@@ -90,31 +124,17 @@ class AccountDetailFragmentTest {
         onView(withText(R.string.no_account_found)).check(matches(isDisplayed()))
     }
 
-// FIXME: snackbar displayed but test did not pass
-
     @Test
     fun retrieveExistingAccountAndDecryptionError_returnsSnackbarTextAccountDecryptFailed() {
-
+        // Given :
         encryptionService.setShouldReturnError(true)
 
-        val bundle = AccountDetailFragmentArgs(account.id).toBundle()
-        launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
-
-//        onView(withText(R.string.no_account_found)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun retrieveAccount_displaysAccount() {
         // When :
         val bundle = AccountDetailFragmentArgs(account.id).toBundle()
         launchFragmentInContainer<AccountDetailFragment>(bundle, R.style.Theme_Sherlock)
 
         // Then :
-        onView(withId(R.id.account_name_text_view)).check(matches(withText(account.name)))
-        onView(withId(R.id.user_name_text_view)).check(matches(withText(account.userName)))
-        onView(withId(R.id.password_text_view)).check(matches(withText(account.password)))
-        onView(withId(R.id.uri_text_view)).check(matches(withText(account.uri)))
-        onView(withId(R.id.note_text_view)).check(matches(withText(account.note)))
+        onView(withText(R.string.account_decrypt_failed)).check(matches(isDisplayed()))
     }
 
     @Test

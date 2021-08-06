@@ -11,6 +11,8 @@ import com.adityaoo7.sherlock.services.EncryptionService
 import com.adityaoo7.sherlock.services.HashingService
 import com.adityaoo7.sherlock.util.ValidationUtil
 import com.adityaoo7.sherlock.util.VerificationAccount
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
@@ -18,7 +20,8 @@ import java.security.SecureRandom
 class ResetPasswordViewModel(
     private val repository: AccountsRepository,
     private val encryptionService: EncryptionService,
-    private val sharedPreferencesManager: SharedPreferencesManager
+    private val sharedPreferencesManager: SharedPreferencesManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     val oldPassword = MutableLiveData<String>()
@@ -48,7 +51,7 @@ class ResetPasswordViewModel(
         val validPassword = ValidationUtil.validatePassword(oldPassword.value)
         if (validPassword) {
             _dataLoading.value = true
-            viewModelScope.launch {
+            viewModelScope.launch(ioDispatcher) {
                 when (val errorValue = login()) {
                     VERIFIED -> {
                         when (val rErrorValue = retrieveAllAccounts()) {

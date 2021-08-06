@@ -22,7 +22,6 @@ import com.adityaoo7.sherlock.util.MainCoroutineRuleAndroid
 import com.adityaoo7.sherlock.util.VerificationAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -127,47 +126,6 @@ class ResetPasswordFragmentTest {
         verify(navController).navigate(
             ResetPasswordFragmentDirections.actionResetPasswordFragmentToHomeFragment()
         )
-    }
-
-    @Test
-    fun processingResetPassword_loading() {
-        // Given :
-        sharedPreferencesManagerAndroid.putSalt("Some Salt")
-        sharedPreferencesManagerAndroid.putVerificationAccount(VerificationAccount.instance)
-
-        mainCoroutineRuleAndroid.pauseDispatcher()
-
-        // When :
-        val scenario =
-            launchFragmentInContainer<ResetPasswordFragment>(Bundle(), R.style.Theme_Sherlock)
-        val navController = mock(NavController::class.java)
-
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
-
-        onView(withId(R.id.old_password_edit_text)).perform(
-            typeText("OldPassword@123"),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.new_password_edit_text)).perform(
-            typeText("NewPassword@123"),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.confirm_new_password_edit_text)).perform(
-            typeText("NewPassword@123"),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.reset_password_button)).perform(click())
-
-        // Then :
-        onView(withId(R.id.processing_reset_password_layout)).check(matches(isDisplayed()))
-
-        mainCoroutineRuleAndroid.resumeDispatcher()
-
-        onView(withId(R.id.processing_reset_password_layout)).check(matches(not(isDisplayed())))
     }
 
     @Test

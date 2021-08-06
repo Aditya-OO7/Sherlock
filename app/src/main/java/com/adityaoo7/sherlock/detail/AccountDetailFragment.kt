@@ -25,6 +25,8 @@ import com.google.android.material.transition.MaterialSharedAxis
 
 class AccountDetailFragment : Fragment() {
 
+    private val TAG = AccountDetailFragment::class.java.simpleName
+
     private lateinit var binding: FragmentAccountDetailBinding
 
     private val detailViewModel by viewModels<AccountDetailViewModel> {
@@ -58,7 +60,7 @@ class AccountDetailFragment : Fragment() {
     ): View {
 
         binding = FragmentAccountDetailBinding.inflate(inflater, container, false).apply {
-            this.viewModel = detailViewModel
+            viewModel = detailViewModel
         }
 
         binding.lifecycleOwner = this.viewLifecycleOwner
@@ -69,6 +71,16 @@ class AccountDetailFragment : Fragment() {
             if (string != null) {
                 Snackbar.make(requireView(), getString(string), Snackbar.LENGTH_SHORT).show()
                 detailViewModel.doneShowingSnackbar()
+            }
+        })
+
+        detailViewModel.dataLoading.observe(viewLifecycleOwner, { isLoading ->
+            if (isLoading) {
+                binding.accountDetailsLayout.visibility = View.GONE
+                binding.loadingAccountDetailsLayout.visibility = View.VISIBLE
+            } else {
+                binding.accountDetailsLayout.visibility = View.VISIBLE
+                binding.loadingAccountDetailsLayout.visibility = View.GONE
             }
         })
 

@@ -7,33 +7,51 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.adityaoo7.sherlock.MainActivity
 import com.adityaoo7.sherlock.R
 import com.adityaoo7.sherlock.SherlockApplication
-import com.adityaoo7.sherlock.databinding.FragmentAuthenticationBinding
+import com.adityaoo7.sherlock.data.Result
+import com.adityaoo7.sherlock.data.succeeded
+import com.adityaoo7.sherlock.databinding.FragmentLoginBinding
 import com.google.android.material.snackbar.Snackbar
 
+class LoginFragment : Fragment() {
 
-class AuthenticationFragment : Fragment() {
+    private val TAG = LoginFragment::class.java.simpleName
 
-    private lateinit var binding: FragmentAuthenticationBinding
-    private val authViewModel by viewModels<AuthenticationViewModel> {
+    private lateinit var binding: FragmentLoginBinding
+
+    private val authViewModel by activityViewModels<AuthenticationViewModel> {
         AuthenticationViewModelFactory(
             (requireContext().applicationContext as SherlockApplication).sharedPreferencesManager,
             (requireContext().applicationContext as SherlockApplication).encryptionService
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val pref =
+            (requireContext().applicationContext as SherlockApplication).sharedPreferencesManager
+        val result = pref.getIsRegistered()
+        if (result.succeeded) {
+            val isRegistered = (result as Result.Success).data
+            if (!isRegistered) {
+                findNavController()
+                    .navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAuthenticationBinding.inflate(inflater, container, false)
-            .apply {
-                this.viewModel = authViewModel
-            }
-
+        binding = FragmentLoginBinding.inflate(inflater, container, false).apply {
+            viewModel = authViewModel
+        }
         binding.lifecycleOwner = this.viewLifecycleOwner
 
         authViewModel.snackbarText.observe(viewLifecycleOwner, { string ->
@@ -43,25 +61,13 @@ class AuthenticationFragment : Fragment() {
             }
         })
 
-        authViewModel.isRegistered.observe(viewLifecycleOwner, { isRegistered ->
-            if (isRegistered != null) {
-                if (isRegistered) {
-                    binding.headingTextView.text = getString(R.string.login_heading_text_view)
-                    binding.submitButton.text = getString(R.string.login_button_text)
-                    binding.reEnterPasswordEditText.visibility = View.GONE
-                } else {
-                    binding.headingTextView.text = getString(R.string.register_heading_text_view)
-                    binding.submitButton.text = getString(R.string.register_button_text)
-                    binding.reEnterPasswordEditText.visibility = View.VISIBLE
-                }
-            }
-        })
-
         authViewModel.dataLoading.observe(viewLifecycleOwner, { isLoading ->
             if (isLoading) {
-                binding.authProgressBar.visibility = View.VISIBLE
+                binding.loadingLoginLayout.visibility = View.VISIBLE
+                binding.loginPasswordEditText.visibility = View.INVISIBLE
             } else {
-                binding.authProgressBar.visibility = View.GONE
+                binding.loginPasswordEditText.visibility = View.VISIBLE
+                binding.loadingLoginLayout.visibility = View.GONE
             }
         })
 
@@ -70,7 +76,7 @@ class AuthenticationFragment : Fragment() {
                 Toast.makeText(requireContext(), R.string.auth_success, Toast.LENGTH_LONG).show()
                 startActivity(Intent(requireContext(), MainActivity::class.java))
                 requireActivity().finishAffinity()
-                authViewModel.doneNavigating()
+                authViewModel.doneNavigatingToHomeScreen()
             }
         })
 

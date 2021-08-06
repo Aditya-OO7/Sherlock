@@ -46,6 +46,7 @@ class AddEditFragmentTest {
     fun tearDown() = runBlockingTest {
         ServiceLocator.resetRepository()
         encryptionService.setShouldReturnError(false)
+        encryptionService.setShouldReturnDifferentAccount(false)
     }
 
     @Before
@@ -56,103 +57,6 @@ class AddEditFragmentTest {
     @After
     fun unregisterIdlingResource() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
-    }
-
-    @Test
-    fun retrieveExistingAccountError_returnsSnackbarTextNoAccountFound() = runBlockingTest {
-        // Given :
-        val account = LoginAccount(
-            "Existing Account",
-            "Existing user name",
-            "ExistingPassword",
-            "https://existinguri.com",
-            "This is Existing Note saved to Database"
-        )
-        repository.saveAccount(account)
-        repository.setReturnError(true)
-
-        // When :
-        val bundle = AddEditFragmentArgs(account.id).toBundle()
-        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
-
-        // Then :
-        onView(withText(R.string.no_account_found)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun retrievedAccountDecryptionError_returnsSnackbarTextAccountDecryptFailed() =
-        runBlockingTest {
-            // Given :
-            val account = LoginAccount(
-                "Existing Account",
-                "Existing user name",
-                "ExistingPassword",
-                "https://existinguri.com",
-                "This is Existing Note saved to Database"
-            )
-            repository.saveAccount(account)
-            encryptionService.setShouldReturnError(true)
-
-            // When :
-            val bundle = AddEditFragmentArgs(account.id).toBundle()
-            launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
-
-            // Then :
-            onView(withText(R.string.account_decrypt_failed)).check(matches(isDisplayed()))
-        }
-
-    @Test
-    fun saveEmptyAccount_returnsSnackbarTextEmptyAccount() {
-
-        // When :
-        val bundle = AddEditFragmentArgs(null).toBundle()
-        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
-
-        onView(withId(R.id.save_account_button)).perform(click())
-
-        // Then :
-        onView(withText(R.string.empty_account)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun createAndSaveAccountEncryptionError_returnsSnackbarTextAccountEncryptFailed() {
-        // When :
-        val bundle = AddEditFragmentArgs(null).toBundle()
-        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
-
-        encryptionService.setShouldReturnError(true)
-
-        onView(withId(R.id.account_name_edit_text)).perform(
-            typeText("New Account"),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.user_name_edit_text)).perform(
-            typeText("MyAccount"),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.password_edit_text)).perform(
-            typeText("Password@123"),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.toggle_view_password_button)).perform(click())
-        onView(withId(R.id.toggle_view_password_button)).perform(click())
-        onView(withId(R.id.toggle_view_password_button)).perform(click())
-
-        onView(withId(R.id.uri_edit_text)).perform(
-            typeText("https://newaccounturi.com"),
-            closeSoftKeyboard()
-        )
-        onView(withId(R.id.note_edit_text)).perform(
-            typeText("Note for this new account. You can enter note for your account"),
-            closeSoftKeyboard()
-        )
-
-        onView(withId(R.id.save_account_button)).perform(click())
-
-        // Then :
-        onView(withText(R.string.account_encrypt_failed)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -221,43 +125,6 @@ class AddEditFragmentTest {
     }
 
     @Test
-    fun updateExistingAccountEncryptionError_returnsSnackbarTextAccountEncryptionFailed() =
-        runBlockingTest {
-            // Given :
-            val account = LoginAccount(
-                "Existing Account",
-                "Existing user name",
-                "ExistingPassword",
-                "https://existinguri.com",
-                "This is Existing Note saved to Database"
-            )
-            repository.saveAccount(account)
-
-            // When :
-            val bundle = AddEditFragmentArgs(account.id).toBundle()
-            launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
-
-            encryptionService.setShouldReturnError(true)
-
-            onView(withId(R.id.user_name_edit_text)).perform(clearText())
-            onView(withId(R.id.password_edit_text)).perform(clearText())
-
-            onView(withId(R.id.user_name_edit_text)).perform(
-                typeText("Updated User Name"),
-                closeSoftKeyboard()
-            )
-            onView(withId(R.id.password_edit_text)).perform(
-                typeText("UpdatedPassword"),
-                closeSoftKeyboard()
-            )
-
-            onView(withId(R.id.save_account_button)).perform(click())
-
-            // Then :
-            onView(withText(R.string.account_encrypt_failed)).check(matches(isDisplayed()))
-        }
-
-    @Test
     fun updateExistingAccount_returnsSnackbarTextSaveSuccess() = runBlockingTest {
         // Given :
         val account = LoginAccount(
@@ -299,4 +166,126 @@ class AddEditFragmentTest {
             AddEditFragmentDirections.actionAddEditFragmentToHomeFragment()
         )
     }
+
+    @Test
+    fun retrieveExistingAccountError_returnsSnackbarTextNoAccountFound() = runBlockingTest {
+        // Given :
+        repository.setReturnError(true)
+
+        // When :
+        val bundle = AddEditFragmentArgs("SomeID").toBundle()
+        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
+
+        // Then :
+        onView(withText(R.string.no_account_found)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun retrievedAccountDecryptionError_returnsSnackbarTextAccountDecryptFailed() =
+        runBlockingTest {
+            // Given :
+            val account = LoginAccount(
+                "Existing Account",
+                "Existing user name",
+                "ExistingPassword",
+                "https://existinguri.com",
+                "This is Existing Note saved to Database"
+            )
+            repository.saveAccount(account)
+            encryptionService.setShouldReturnError(true)
+
+            // When :
+            val bundle = AddEditFragmentArgs(account.id).toBundle()
+            launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
+
+            // Then :
+            onView(withText(R.string.account_decrypt_failed)).check(matches(isDisplayed()))
+        }
+
+    @Test
+    fun saveEmptyAccount_returnsSnackbarTextEmptyAccount() {
+
+        // When :
+        val bundle = AddEditFragmentArgs(null).toBundle()
+        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
+
+        onView(withId(R.id.save_account_button)).perform(click())
+
+        // Then :
+        onView(withText(R.string.empty_account)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun createAndSaveAccountEncryptionError_returnsSnackbarTextAccountEncryptFailed() {
+        // When :
+        val bundle = AddEditFragmentArgs(null).toBundle()
+        launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
+
+        encryptionService.setShouldReturnError(true)
+
+        onView(withId(R.id.account_name_edit_text)).perform(
+            typeText("New Account"),
+            closeSoftKeyboard()
+        )
+
+        onView(withId(R.id.user_name_edit_text)).perform(
+            typeText("MyAccount"),
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.password_edit_text)).perform(
+            typeText("Password@123"),
+            closeSoftKeyboard()
+        )
+
+        onView(withId(R.id.uri_edit_text)).perform(
+            typeText("https://newaccounturi.com"),
+            closeSoftKeyboard()
+        )
+        onView(withId(R.id.note_edit_text)).perform(
+            typeText("Note for this new account. You can enter note for your account"),
+            closeSoftKeyboard()
+        )
+
+        onView(withId(R.id.save_account_button)).perform(click())
+
+        // Then :
+        onView(withText(R.string.account_encrypt_failed)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun updateExistingAccountEncryptionError_returnsSnackbarTextAccountEncryptionFailed() =
+        runBlockingTest {
+            // Given :
+            val account = LoginAccount(
+                "Existing Account",
+                "Existing user name",
+                "ExistingPassword",
+                "https://existinguri.com",
+                "This is Existing Note saved to Database"
+            )
+            repository.saveAccount(account)
+
+            // When :
+            val bundle = AddEditFragmentArgs(account.id).toBundle()
+            launchFragmentInContainer<AddEditFragment>(bundle, R.style.Theme_Sherlock)
+
+            encryptionService.setShouldReturnError(true)
+
+            onView(withId(R.id.user_name_edit_text)).perform(clearText())
+            onView(withId(R.id.password_edit_text)).perform(clearText())
+
+            onView(withId(R.id.user_name_edit_text)).perform(
+                typeText("Updated User Name"),
+                closeSoftKeyboard()
+            )
+            onView(withId(R.id.password_edit_text)).perform(
+                typeText("UpdatedPassword"),
+                closeSoftKeyboard()
+            )
+
+            onView(withId(R.id.save_account_button)).perform(click())
+
+            // Then :
+            onView(withText(R.string.account_encrypt_failed)).check(matches(isDisplayed()))
+        }
 }

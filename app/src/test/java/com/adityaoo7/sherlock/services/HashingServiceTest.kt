@@ -1,23 +1,15 @@
 package com.adityaoo7.sherlock.services
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
-import org.junit.Before
 import org.junit.Test
 import javax.crypto.SecretKey
 
 class HashingServiceTest {
 
-    @ExperimentalCoroutinesApi
-    @Before
-    fun setUp() = runBlockingTest {
-        HashingService.hashPassword("TestPassword", "SomeSalt")
-    }
-
     @Test
     fun getKey_returnsKey() {
+        HashingService.hashPassword("TestPassword", "SomeSalt")
 
         // When :
         val result = HashingService.getKey()
@@ -29,6 +21,7 @@ class HashingServiceTest {
 
     @Test
     fun getKeyTwice_returnsSameKey() {
+        HashingService.hashPassword("TestPassword", "SomeSalt")
 
         // When :
         val result1 = HashingService.getKey()

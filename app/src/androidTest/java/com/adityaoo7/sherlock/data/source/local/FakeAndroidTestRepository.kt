@@ -1,5 +1,6 @@
 package com.adityaoo7.sherlock.data.source.local
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -9,6 +10,8 @@ import com.adityaoo7.sherlock.data.repository.AccountsRepository
 import kotlinx.coroutines.runBlocking
 
 class FakeAndroidTestRepository : AccountsRepository {
+
+    private val TAG = FakeAndroidTestRepository::class.java.simpleName
 
     var accountsServiceData: LinkedHashMap<String, LoginAccount> = LinkedHashMap()
 
@@ -60,16 +63,20 @@ class FakeAndroidTestRepository : AccountsRepository {
 
     override suspend fun saveAccount(account: LoginAccount) {
         accountsServiceData[account.id] = account
+
+        refreshAccounts()
     }
 
     override suspend fun saveAccounts(accounts: List<LoginAccount>) {
         accounts.forEach { account ->
             accountsServiceData[account.id] = account
         }
+        refreshAccounts()
     }
 
     override suspend fun updateAccount(account: LoginAccount) {
         accountsServiceData[account.id] = account
+        refreshAccounts()
     }
 
     override suspend fun deleteAccount(accountID: String) {

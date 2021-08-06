@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.adityaoo7.sherlock.R
@@ -31,6 +32,10 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var listAdapter: AccountsAdapter
+
+    companion object {
+        lateinit var extras: FragmentNavigator.Extras
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,7 +129,7 @@ class HomeFragment : Fragment() {
                 }
                 val accountDetailTransition = getString(R.string.account_detail_transition)
 
-                val extras = FragmentNavigatorExtras(
+                extras = FragmentNavigatorExtras(
                     requireView().findViewById<LinearLayout>(R.id.account_item_layout) to accountDetailTransition
                 )
 
@@ -144,10 +149,10 @@ class HomeFragment : Fragment() {
                     duration =
                         resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
                 }
-                homeViewModel.doneNavigatingResetPassword()
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeFragmentToResetPasswordFragment()
                 )
+                homeViewModel.doneNavigatingResetPassword()
             }
         })
 

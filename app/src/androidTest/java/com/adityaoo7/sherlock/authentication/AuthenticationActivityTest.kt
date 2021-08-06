@@ -1,17 +1,15 @@
-package com.adityaoo7.sherlock
+package com.adityaoo7.sherlock.authentication
 
-import android.app.Activity
-import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
+import androidx.test.core.app.launchActivity
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
+import com.adityaoo7.sherlock.R
+import com.adityaoo7.sherlock.ServiceLocator
 import com.adityaoo7.sherlock.data.LoginAccount
 import com.adityaoo7.sherlock.data.source.local.FakeAndroidTestRepository
 import com.adityaoo7.sherlock.data.source.shared.FakeSharedPreferencesManagerAndroid
@@ -23,8 +21,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@LargeTest
-class AppNavigationTest {
+@MediumTest
+class AuthenticationActivityTest {
 
     private lateinit var accountsRepository: FakeAndroidTestRepository
     private lateinit var encryptionService: FakeEncryptionServiceAndroid
@@ -80,34 +78,25 @@ class AppNavigationTest {
     }
 
     @Test
-    fun checkUpButton_doubleUpButtonWorks() {
-        val scenario = ActivityScenario.launch(MainActivity::class.java)
+    fun registerAndLogin_navigatesToHomeScreen() {
+        launchActivity<AuthenticationActivity>()
 
-        onView(withId(R.id.accounts_list))
-            .perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withText("ACCOUNT 1")), click()
-                )
-            )
+        Espresso.onView(ViewMatchers.withId(R.id.enter_password_edit_text)).perform(
+            ViewActions.typeText("Password@123"),
+            ViewActions.closeSoftKeyboard()
+        )
+        Espresso.onView(ViewMatchers.withId(R.id.re_enter_password_edit_text)).perform(
+            ViewActions.typeText("Password@123"),
+            ViewActions.closeSoftKeyboard()
+        )
+        Espresso.onView(ViewMatchers.withId(R.id.register_button)).perform(ViewActions.click())
 
-        onView(withId(R.id.edit_account_button)).perform(click())
+        Espresso.onView(ViewMatchers.withId(R.id.login_layout))
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-        onView(withContentDescription(scenario.getToolbarNavigationContentDescription()))
-            .perform(click())
+        Espresso.onView(ViewMatchers.withId(R.id.login_button)).perform(ViewActions.click())
 
-        onView(withId(R.id.account_details_layout)).check(matches(isDisplayed()))
-
-        onView(withContentDescription(scenario.getToolbarNavigationContentDescription()))
-            .perform(click())
-
-        onView(withId(R.id.home_layout)).check(matches(isDisplayed()))
+        Espresso.onView(ViewMatchers.withId(R.id.home_layout))
+            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
     }
-}
-
-fun <T : Activity> ActivityScenario<T>.getToolbarNavigationContentDescription(): String {
-    var description = ""
-    onActivity {
-        description = it.findViewById<Toolbar>(R.id.toolbar).navigationContentDescription as String
-    }
-    return description
 }

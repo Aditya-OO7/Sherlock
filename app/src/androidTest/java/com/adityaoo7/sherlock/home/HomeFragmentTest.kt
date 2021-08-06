@@ -49,6 +49,25 @@ class HomeFragmentTest {
 
         ServiceLocator.accountsRepository = repository
         ServiceLocator.encryptionService = encryptionService
+
+        repository.addAccounts(
+            LoginAccount(
+                "ACCOUNT 1",
+                "USER NAME 1",
+                "PASSWORD1",
+                "https//:uri.com",
+                "NOTE 1",
+                "id1"
+            ),
+            LoginAccount(
+                "ACCOUNT 2",
+                "USER NAME 2",
+                "PASSWORD2",
+                "https//:uri2.com",
+                "NOTE 2",
+                "id2"
+            )
+        )
     }
 
     @After
@@ -67,8 +86,28 @@ class HomeFragmentTest {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 
+
+    @Test
+    fun loadAccounts_loading() = runBlockingTest {
+        // Given :
+        mainCoroutineRuleAndroid.pauseDispatcher()
+
+        // When :
+        launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
+
+        // Then :
+        onView(withId(R.id.loading_accounts_layout)).check(matches(isDisplayed()))
+
+        mainCoroutineRuleAndroid.resumeDispatcher()
+
+        onView(withId(R.id.loading_accounts_layout)).check(matches(not(isDisplayed())))
+    }
+
     @Test
     fun noAccountsPresent_showsNoAccountsLayout() {
+        // Given :
+        repository.accountsServiceData.clear()
+
         // When :
         launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
 
@@ -76,55 +115,26 @@ class HomeFragmentTest {
         onView(withId(R.id.no_accounts_layout)).check(matches(isDisplayed()))
     }
 
+/*
     // FIXME: Snackbar is displayed but tests did not pass
     @Test
     fun observeAccountsError_returnsSnackbarTextLoadingAccountsError() {
         repository.setReturnError(true)
         launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
-//         onView(withText(R.string.loading_accounts_error)).check(matches(isDisplayed()))
+        onView(withText(R.string.loading_accounts_error)).check(matches(isDisplayed()))
     }
 
     // FIXME: Snackbar is displayed but tests did not pass
     @Test
     fun decryptionError_returnsSnackbarTextAccountDecryptFailed() = runBlockingTest {
-        repository.addAccounts(
-            LoginAccount(
-                "ACCOUNT 1",
-                "USER NAME 1",
-                "PASSWORD1",
-                "https//:uri.com",
-                "NOTE 1",
-                "id1"
-            )
-        )
         encryptionService.setShouldReturnError(true)
         launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
-//         onView(withText(R.string.account_decrypt_failed)).check(matches(isDisplayed()))
+        onView(withText(R.string.account_decrypt_failed)).check(matches(isDisplayed()))
     }
+*/
 
-    // FIXME : Requires to provide extras with directions for navigate for testing
-    /*@Test
+    @Test
     fun clickAccount_navigateToAccountDetailFragment() = runBlockingTest {
-        // Given :
-        repository.addAccounts(
-            LoginAccount(
-                "ACCOUNT 1",
-                "USER NAME 1",
-                "PASSWORD1",
-                "https//:uri.com",
-                "NOTE 1",
-                "id1"
-            ),
-            LoginAccount(
-                "ACCOUNT 2",
-                "USER NAME 2",
-                "PASSWORD2",
-                "https//:uri2.com",
-                "NOTE 2",
-                "id2"
-            )
-        )
-
         // When :
         val scenario = launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
         val navController = mock(NavController::class.java)
@@ -142,43 +152,10 @@ class HomeFragmentTest {
 
         // Then :
         verify(navController).navigate(
-            HomeFragmentDirections.actionHomeFragmentToAccountDetailFragment("id1")
+            HomeFragmentDirections.actionHomeFragmentToAccountDetailFragment("id1"),
+            HomeFragment.extras
         )
         scenario.close()
-    }*/
-
-    @Test
-    fun loadAccounts_loading() = runBlockingTest {
-        // Given :
-        repository.addAccounts(
-            LoginAccount(
-                "ACCOUNT 1",
-                "USER NAME 1",
-                "PASSWORD1",
-                "https//:uri.com",
-                "NOTE 1",
-                "id1"
-            ),
-            LoginAccount(
-                "ACCOUNT 2",
-                "USER NAME 2",
-                "PASSWORD2",
-                "https//:uri2.com",
-                "NOTE 2",
-                "id2"
-            )
-        )
-        mainCoroutineRuleAndroid.pauseDispatcher()
-
-        // When :
-        launchFragmentInContainer<HomeFragment>(Bundle(), R.style.Theme_Sherlock)
-
-        // Then :
-        onView(withId(R.id.loading_accounts_layout)).check(matches(isDisplayed()))
-
-        mainCoroutineRuleAndroid.resumeDispatcher()
-
-        onView(withId(R.id.loading_accounts_layout)).check(matches(not(isDisplayed())))
     }
 
     @Test

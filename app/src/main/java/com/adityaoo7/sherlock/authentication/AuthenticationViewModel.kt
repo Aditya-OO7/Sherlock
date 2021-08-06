@@ -9,17 +9,22 @@ import com.adityaoo7.sherlock.services.EncryptionService
 import com.adityaoo7.sherlock.services.HashingService
 import com.adityaoo7.sherlock.util.ValidationUtil
 import com.adityaoo7.sherlock.util.VerificationAccount
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 
+
 class AuthenticationViewModel(
     private val sharedPreferencesManager: SharedPreferencesManager,
-    private val encryptionService: EncryptionService
+    private val encryptionService: EncryptionService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
+    private val TAG = AuthenticationViewModel::class.java.simpleName
+
     private val _isRegistered = MutableLiveData<Boolean>()
-    val isRegistered: LiveData<Boolean> = _isRegistered
 
     init {
         getIsRegistered()
@@ -52,8 +57,15 @@ class AuthenticationViewModel(
     private val _navigateToHomeScreen = MutableLiveData<Boolean>()
     val navigateToHomeScreen: LiveData<Boolean> = _navigateToHomeScreen
 
-    fun doneNavigating() {
+    fun doneNavigatingToHomeScreen() {
         _navigateToHomeScreen.value = false
+    }
+
+    private val _navigateToLoginScreen = MutableLiveData<Boolean>()
+    val navigateToLoginScreen: LiveData<Boolean> = _navigateToLoginScreen
+
+    fun doneNavigatingToLoginScreen() {
+        _navigateToLoginScreen.value = false
     }
 
     private suspend fun saveVerificationAccount() {
@@ -109,7 +121,7 @@ class AuthenticationViewModel(
 
         _dataLoading.value = true
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             val result = sharedPreferencesManager.getSalt()
 
             if (result.succeeded) {
@@ -137,7 +149,7 @@ class AuthenticationViewModel(
 
         _dataLoading.value = true
 
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             val salt = getSalt()
             HashingService.hashPassword(password.value!!, salt)
 
@@ -147,9 +159,9 @@ class AuthenticationViewModel(
                 putIsRegistered(true)
                 putSalt(salt)
             }
-            _snackbarText.postValue(R.string.register_success)
             getIsRegistered()
             _dataLoading.postValue(false)
+            _navigateToLoginScreen.postValue(true)
         }
     }
 }

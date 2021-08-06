@@ -9,6 +9,7 @@ import com.adityaoo7.sherlock.services.FakeEncryptionService
 import com.adityaoo7.sherlock.util.MainCoroutineRule
 import com.adityaoo7.sherlock.util.VerificationAccount
 import com.adityaoo7.sherlock.util.getOrAwaitValue
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
@@ -59,7 +60,12 @@ class ResetPasswordViewModelTest {
         repository.addAccounts(account1, account2)
 
         resetPasswordViewModel =
-            ResetPasswordViewModel(repository, encryptionService, sharedPreferencesManager)
+            ResetPasswordViewModel(
+                repository,
+                encryptionService,
+                sharedPreferencesManager,
+                Dispatchers.Main
+            )
     }
 
     @After

@@ -18,7 +18,8 @@ object AccountEncryptionService : EncryptionService {
         val listOfItemsToEncrypt =
             listOf(account.name, account.userName, account.password, account.uri, account.note)
 
-        val listOfEncryptedItems = ArrayList<String>()
+        val listOfEncryptedItems = Array(5) { "" }
+        var i = 0
 
         listOfItemsToEncrypt.forEach { item ->
             cipher.init(Cipher.ENCRYPT_MODE, key)
@@ -27,7 +28,8 @@ object AccountEncryptionService : EncryptionService {
             val total = iv + cipherText
 
             val cipherTextStr = Base64.encodeToString(total, Base64.NO_WRAP)
-            listOfEncryptedItems.add(cipherTextStr)
+            listOfEncryptedItems[i] = cipherTextStr
+            i++
         }
 
         encryptedAccount.name = listOfEncryptedItems[0]
@@ -46,9 +48,10 @@ object AccountEncryptionService : EncryptionService {
         val listOfItemsToDecrypt =
             listOf(account.name, account.userName, account.password, account.uri, account.note)
 
-        val listOfDecryptedItems = ArrayList<String>()
+        val listOfDecryptedItems = Array(5) { "" }
 
         try {
+            var i = 0
             listOfItemsToDecrypt.forEach { item ->
                 val itemByteArray = Base64.decode(item, Base64.NO_WRAP)
 
@@ -61,7 +64,8 @@ object AccountEncryptionService : EncryptionService {
 
                 val plainText = cipher.doFinal(cipherText)
 
-                listOfDecryptedItems.add(String(plainText))
+                listOfDecryptedItems[i] = String(plainText)
+                i++
             }
         } catch (e: Exception) {
             return Result.Error(e)

@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".authentication.AuthenticationActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/auth_fragment_container"
-        android:name="com.adityaoo7.sherlock.authentication.AuthenticationFragment"
+    <fragment
+        android:id="@+id/auth_nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_authentication" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/auth_navigation"
+        tools:layout="@layout/fragment_register"/>
 
 </LinearLayout>

@@ -61,6 +61,7 @@ class AccountDetailViewModel(
         var account: LoginAccount? = null
 
         if (result.succeeded) {
+            _dataLoading.value = true
             viewModelScope.launch {
                 val decryptedResult = encryptionService.decrypt((result as Result.Success).data)
                 account = if (decryptedResult.succeeded) {
@@ -69,6 +70,7 @@ class AccountDetailViewModel(
                     _snackbarText.postValue(R.string.account_decrypt_failed)
                     null
                 }
+                _dataLoading.postValue(false)
             }
         } else {
             _snackbarText.postValue(R.string.no_account_found)

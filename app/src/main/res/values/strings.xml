@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Sherlock</string>
+    <string name="app_subtitle">Password Manager</string>
 
     <!--    Fragment titles -->
     <string name="home_fragment_title">Sherlock</string>
@@ -40,7 +41,7 @@
     <string name="incorrect_password">Password Incorrect!</string>
     <string name="auth_success">Authenticated Successfully!</string>
     <string name="register_success">Registered Successfully!</string>
-    <string name="re_enter_master_password_hint">Re-enter Master Password</string>
+    <string name="re_enter_master_password_hint">Confirm Password</string>
     <string name="enter_master_password_hint">Enter Master Password</string>
     <string name="register_state_not_found">Unable to determine if you\'re registered or not!</string>
     <string name="password_not_match">Re-entered Password don\'t match with original one</string>
@@ -71,10 +72,15 @@
     <string name="reset_password_menu_item">Reset Password</string>
     <string name="reset_password_text_view">Reset Password</string>
     <string name="reset_password_button_text">Reset</string>
-    <string name="confirm_password_edit_text">Re-enter new master password</string>
-    <string name="new_master_password_edit_text">Enter new master password</string>
+    <string name="confirm_password_edit_text">Confirm password</string>
+    <string name="new_master_password_edit_text">New master password</string>
     <string name="enter_old_password_hint">Enter old password</string>
+    <string name="reset_success">Password Reset Successfully!</string>
+
     <string name="user_name_copied_toast">User name copied!</string>
     <string name="password_copied_toast">Password copied!</string>
+    <string name="authenticating_loading_text">Authenticating. Please wait.</string>
+    <string name="reset_password_loading_text">Resetting your password.\nPlease do not close application\nas it will result in loss of data.</string>
+    <string name="loading_account_details_text">Loading account details.</string>
 
 </resources>
